@@ -1,13 +1,804 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./assets/fonts/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./assets/fonts/SFPRODISPLAYBOLD.OTF') format('opentype');
+  font-weight: bold;
+  font-style: normal;
 }
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./assets/fonts/SFPRODISPLAYMEDIUM.OTF') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+.auth-card-img{
+  width: 120px;
+  height: 80px;
+}
+
+.auth-card{
+  padding: 4rem;
+  border-radius: 5px;
+  background: #085c4e96;
+  box-shadow: 5px 10px 20px 5px #01231aa8
+}
+
+.booking-card{
+  border-radius: 5px;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 5px 10px 20px 5px #e3dcdc
+}
+
+.booking-card-header{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 15px;
+  color: #000F1F;
+}
+
+.booking-card-header-sub{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 13px;
+  color: #8F8F8F;
+}
+
+.booking-card-button-text{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 14px;
+  color: #fff;
+}
+
+.booking-card-button-text-alt{
+  color: #CD0000 !important;
+}
+
+.auth-card-button{
+  border-radius: 5rem;
+  padding: 10px;
+  width: 50%;
+  background: #0A4F42;
+}
+
+.hustle-kind{
+  background: #EBEBEC;
+  padding: 10px 20px;
+  width: max-content;
+  border-radius: 20px;
+}
+
+.hustle-kind-selected{
+  background: #1F1F1F !important;
+}
+
+.hustle-kind-text{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 16px;
+  color: #575757;
+}
+
+.hustle-kind-text-selected{
+  color: #fff !important;
+}
+
+.my-booking-button{
+  border-radius: 5rem;
+  padding: 10px 50px;
+  width: max-content;
+  background: #0A4F42;
+}
+
+.my-booking-button-alt-c{
+  border-radius: 5rem;
+  padding: 5px 50px;
+  width: max-content;
+  background: transparent;
+  border: solid 2px #CD0000;
+}
+
+.confirmation-card-button-alt{
+  background: #FDBA40 !important;
+}
+
+.view-more-header-sub{
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.view-more-button{
+  border-radius: 5rem;
+  padding: 10px;
+  width: 100%;
+  background: #0A4F42;
+}
+
+.view-more-button-alt{
+  width: 50% !important;
+}
+
+.editor-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  min-height: 200px;
+}
+
+.view-more-header{
+  font-family: 'SF Pro Display';
+  font-weight: bold;
+  font-size: 20px;
+  color: #3C4855;
+  line-height: 15px;
+}
+
+.view-more-header-alt{
+  font-size: 18px;
+  color: #000F1F !important;
+}
+
+.modal-more-button{
+  border-radius: 5rem;
+  width: auto;
+  padding: 8px 25px;
+  background: #0A4F42;
+}
+
+.badge-button{
+  border-radius: 5rem;
+  width: max-content;
+  padding: 5px 25px;
+  margin-bottom: 0.5rem;
+}
+
+.badge-button-text{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.modal-more-button-text{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 12px;
+  color: #fff;
+}
+
+.register-card-button{
+  border-radius: 5rem;
+  padding: 15px;
+  width: 100%;
+  background: #0A4F42;
+}
+
+.register-card-h1{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 22px;
+  color: #fff;
+}
+
+.view-more-button-text{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 16px;
+  color: #fff;
+}
+
+.auth-card-h1{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 16px;
+  color: #fff;
+}
+
+.lh{
+  line-height: 45px;
+}
+
+.auth-card-opt{
+  background: transparent !important;
+  border: 1px solid #fff !important;
+}
+
+.auth-card-header{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 35px;
+  color: #fff;
+  width: 86%;
+  text-align: center;
+}
+
+.register-card-p-alt{
+  color: #575757 !important;
+  text-align: left !important;
+  font-size: 15px !important;
+  width: 100% !important;
+}
+
+.register-card-p{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 18px;
+  color: #8F8F8F;
+  width: 86%;
+  text-align: center;
+}
+
+.register-card-header{
+  font-family: 'SF Pro Display';
+  font-weight: bold;
+  font-size: 22px;
+  color: #575757;
+  width: 86%;
+  text-align: center;
+}
+
+.auth-card-header-alt{
+  width: 100%;
+  font-size: 32px;
+}
+
+.auth-card-p-alt{
+  color: #3C4855 !important;
+  font-size: 18px !important;
+  width: 100% !important;
+}
+
+.auth-card-p{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 15px;
+  color: #fff;
+  width: 70%;
+  text-align: center;
+}
+
+.confirmation-card-p{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 16px;
+  color: #fff;
+  width: 80%;
+  text-align: center;
+}
+
+.forgot-password-p{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 15px;
+  color: #EBA100;
+  width: 70%;
+  text-align: left;
+}
+
+.auth-mode-card {
+  display: flex;
+  width: 164px;
+  padding: 1rem;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 15px;
+  border-radius: 16px;
+  border: 1px solid #fff;
+}
+
+.auth-mode-card-text {
+  color: #fff;
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.2px;
+}
+
+.auth-card-button-sign{
+  background: #FDBA40;
+  width: 70%;
+  margin-top: 1rem;
+}
+
+.submit-proposal-button-sign{
+  background: #0A4F42;
+  width: 60%;
+  margin-top: 1rem;
+}
+
+.submit-proposal-button-sign-alt{
+  background: #bababa;
+  width: 60%;
+  margin-top: 1rem;
+}
+
+.create-account-link{
+  color: #FDBA40
+}
+
+.register-account-link{
+  color: #0A4F42
+}
+
+.social-button{
+  border-radius: 15px;
+  padding: 10px;
+  border: 1px solid #C7C7C7;
+}
+
+hr.default {
+  border-top: 1px solid #C7C7C7;
+  width: 100%;
+}
+
+.proposal-placeholder-text{
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.toggle-active-color{
+  background-color: #C7C7C7;
+}
+
+.wallet-card {
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.wallet-card-pink{
+  background: #F6E6FA;
+}
+
+.wallet-card-blue{
+  background: #E3EEFE;
+}
+
+.wallet-card-green{
+  background: #E8F9DF;
+}
+
+.wallet-card-cyan{
+  background: #DDF3F1;
+}
+
+.wallet-hustle-card{
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid #bab6b6;
+}
+
+.auth-input-box{
+  display: flex;
+  padding: 10px 15px;
+  align-items: center;
+  font-size: 20px;
+  align-self: stretch;
+  border-radius: 8px;
+  border: 1px solid #bab6b6;
+  width: 100%;
+  color: #8F8F8F;
+  margin-top: 5px;
+}
+
+.auth-input-box-alt{
+  padding: 10px 50px;
+}
+
+.auth-input-box-alt-sub{
+  display:block !important
+}
+
+.working-input-box{
+  width: 20rem !important;
+}
+
+.linear-bg{
+  border-radius: 15px;
+  padding: 2.5rem;
+  background: linear-gradient(91.88deg, #FFCA22 -43%, #0C866F 98.41%);
+}
+
+.icon-img{
+  border-radius: 50%;
+}
+
+.linear-bg-alt{
+  border-radius: 15px;
+  padding: 2.3rem;
+  background: linear-gradient(91.88deg, #000 -43%, #0C866F 98.41%);
+}
+
+.form-label{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 16px;
+  color: #3C4855;
+}
+
+.form-label-alt{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 14px;
+  color: #3C4855;
+}
+
+.info-card{
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.info-card-border{
+  border-radius: 15px 15px 0 0;
+}
+
+.service-amount{
+  color: #0A4F42;
+  font-size: 16px;
+  font-family: 'SF Pro Display';
+  font-weight: bold;
+}
+
+.info-card-text-color{
+  color: #0A4F42;
+  font-size: 14px;
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+}
+
+.info-card-ellipsis {
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-card-desc{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 14px;
+  color: #575757;
+}
+
+.info-card-desc-alt{
+  font-size: 18px !important;
+}
+
+.info-card-desc-mb{
+  border-bottom: 2px solid #FDBA40;
+  font-weight: 500;
+}
+
+.info-card-header{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 15px;
+  color: #3C4855;
+}
+
+.info-card-time{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 12px;
+  color: #8F8F8F;
+}
+
+.info-card-time-alt{
+  color: #575757 !important;
+  font-size: 14px !important;
+}
+
+.main-header{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 16px;
+  color: #000F1F;
+}
+
+.category-desc{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 14px;
+  color: #1F1F1F;
+}
+
+.banner-header{
+  font-family: 'SF Pro Display';
+  font-weight: bold;
+  font-size: 32px;
+  color: #fff;
+}
+
+.banner-p{
+  font-family: 'SF Pro Display';
+  font-weight: 400;
+  font-size: 18px;
+  color: #fff;
+}
+
+.sidebar-label{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 16px;
+  color: #fff;
+}
+
+.auth-input-box:focus{
+  outline: none;
+}
+
+.css-p4oxat-control, .css-hlgwow{
+  height: 3rem !important;
+  border-radius: 8px !important;
+}
+
+.modal {
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 83%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-main {
+  border-radius: 5px;
+  /* padding: 1rem; */
+  position: absolute;
+  background: white;
+  width: 60%;
+  height: 100%;
+  bottom: 0;
+  right: 0;
+}
+
+.modal-middle-main {
+  border-radius: 15px;
+  padding: 2rem;
+  position: absolute;
+  background: white;
+  width: 40%;
+  height: auto;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+
+.modal-header{
+  display: flex;
+  align-items: end;
+  justify-content: end;
+}
+
+.modal-header-text{
+  font-family: 'SF Pro Display';
+  font-weight: 500;
+  font-size: 16px;
+  color: #000F1F
+}
+
+.modal-header-text-alt{
+  font-family: 'SF Pro Display';
+  font-weight: bold;
+  font-size: 14px;
+  color: #1F1F1F
+}
+
+.skill-bubble{
+  background: #EBEBEC;
+  padding: 4px 15px;
+  border-radius: 20px;
+}
+
+.skill-bubble-text{
+  color: #535B65;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: 'SF Pro Display';
+}
+
+.menu-bar {
+  background: white;
+  width: 18rem;
+  padding: 1rem;
+  line-height: 2rem;
+  box-shadow: 1px 2px 7px 0px #afafd46b;
+  border-radius: 5px;
+  margin-top: -1rem
+}
+
+.menu-bar-alt{
+  width: 24rem !important;
+}
+
+.share-copy-bg {
+  border-radius: 15px;
+  padding: 1rem;
+  margin-top: 2rem;
+  width: 100%;
+  background-color: #F3E4C8;
+}
+
+.share-text{
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+}
+
+.share-text-copy{
+  font-family: "SF Pro Display";
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 24px;
+  text-align: left;
+  padding: 0.2rem;
+  border-radius: 5px;
+}
+
+/* CustomToast.css */
+.custom-toast-wrapper {
+  width: max-content !important;
+  border-radius: 20 !important;
+  background-color: #10813f !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 1rem;
+}
+
+.custom-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.auth-input-box-date{
+  width: auto !important;
+}
+
+.setting-heading{
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+  color: #8F8F8F;
+}
+
+.textarea-box{
+  border: 1px solid #bab6b6;
+  border-radius: 5px;
+  padding: 1rem;
+}
+
+.textarea-box:focus{
+  outline: none;
+}
+
+.setting-heading-sub{
+  font-family: "SF Pro Display";
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+  color: #8F8F8F;
+}
+
+.hc-border{
+  border: solid 1px #bab6b6;
+}
+
+@media screen and (max-width: 768px) {
+  .modal {
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-main{
+    width: 100%;
+  }
+}
+
+/* Image Avator Upload */
+.img-container {
+  max-width: 960px;
+  /* margin: 30px auto; */
+  padding: 20px;
+}
+
+.avatar-upload {
+  position: relative;
+}
+
+.avatar-upload .avatar-edit {
+  position: absolute;
+  right: 75px;
+  z-index: 1;
+  bottom: -30px;
+}
+
+.avatar-upload .avatar-edit input {
+  display: none;
+}
+
+.avatar-upload .avatar-edit input + label {
+  display: inline-block;
+  width: 65px;
+  height: 65px;
+  margin-bottom: 0;
+  border-radius: 100%;
+  background: #FFFFFF;
+  border: 1px solid transparent;
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.12);
+  cursor: pointer;
+  font-weight: normal;
+  transition: all .2s ease-in-out;
+}
+
+.avatar-upload .avatar-edit input + label:hover {
+  background: #f1f1f1;
+  border-color: #d6d6d6;
+}
+
+.background-pattern{
+  background-image: url('./assets/images/background_pattern.png');
+  background-color: #026969;
+}
+
+.avatar-upload .avatar-edit input + label:after {
+  content: url('./assets/images/img.png');
+  color: #757575;
+  position: absolute;
+  top: 16px;
+  left: 3px;
+  right: 0;
+  text-align: center;
+  margin: auto;
+}
+
+.avatar-upload-alt .avatar-preview-alt {
+  width: 25rem !important;
+  height: 270px !important;
+  position: relative;
+}
+
+.avatar-upload .avatar-preview {
+  width: 30rem;
+  height: 433px;
+  position: relative;
+}
+.avatar-upload .avatar-preview > div {
+  width: 70%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* Image Avator Upload */
