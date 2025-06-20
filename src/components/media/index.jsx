@@ -1,4 +1,5 @@
-import shortid from "https://cdn.skypack.dev/shortid@2.2.16";
+// import shortid from "https://cdn.skypack.dev/shortid@2.2.16";
+import shortid from 'shortid';
 import "./media.css"
 import { useState } from "react";
 import { ShowToast } from "../showToast";
