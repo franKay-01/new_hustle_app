@@ -723,6 +723,32 @@ hr.default {
   .modal-main{
     width: 100%;
   }
+
+  .auth-card-header {
+    font-family: 'SF Pro Display';
+    font-weight: 400;
+    font-size: 24px;
+    color: #fff;
+    width: 86%;
+    text-align: center;
+  }
+
+  .auth-card-h1 {
+    font-family: 'SF Pro Display';
+    font-weight: 400;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .register-card-p {
+    font-family: 'SF Pro Display';
+    font-weight: 400;
+    font-size: 16px;
+    color: #8F8F8F;
+    width: 86%;
+    text-align: center;
+  }
 }
 
 /* Image Avator Upload */

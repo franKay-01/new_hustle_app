@@ -128,7 +128,7 @@ export default function RegisterDetailsPage(){
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2'>
       <div
-        className="relative bg-cover bg-center min-h-[100vh] flex items-center justify-center"
+        className="hidden relative lg:flex md:flex bg-cover bg-center min-h-[100vh] flex items-center justify-center"
         style={{ backgroundImage: `url(${register_img})` }}
       >
       </div>
@@ -140,7 +140,7 @@ export default function RegisterDetailsPage(){
           <p className='register-card-p mt-2'>This is where your journey begins. Let’s get you in.</p>
         
         </div>
-        <div className="grid grid-cols-1 gap-2 px-28 mt-4">
+        <div className="grid grid-cols-1 gap-2 px-4 lg:px-28 md:px-12 mt-4">
           <div>
             <label className="form-label mt-1 mb-2">Enter Email</label>
             <input onChange={handleChange} value={form.first_name} name="first_name" 
