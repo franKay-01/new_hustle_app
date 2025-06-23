@@ -71,7 +71,7 @@ export default function HustleDetailModal({handleClose, show, handleShowProposal
 
   return (
     <div className={showHideClassName}>
-      <section className="modal-main">
+      <section className="modal-main !bg-[#F5F5F5] overflow-y-auto">
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Hustle details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
@@ -260,7 +260,7 @@ export default function HustleDetailModal({handleClose, show, handleShowProposal
               <h1 className="info-card-time info-card-time-alt">Location</h1>
               <h1 className="info-card-text-color">Accra</h1>
             </div>
-            <div className="flex flex-row justify-between mt-4">
+            <div className="flex flex-col gap-4 lg:flex-row md:flex-row justify-between mt-4">
               <div className="flex flex-col">
                 <h1 className="info-card-time info-card-time-alt">Experience level</h1>
                 <h1 className="info-card-text-color">Beginner</h1>
