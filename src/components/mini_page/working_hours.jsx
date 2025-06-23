@@ -26,12 +26,12 @@ export default function WorkingHoursMiniPage() {
   };
 
   return (
-    <div className="flex flex-col p-2">
+    <div className="flex flex-col p-0 lg:p-2 md:p-2">
       <h1 className="text-xl font-regular mb-2">Working hours</h1>
       <hr className='default'/>
-      <div className='flex flex-col gap-2 px-24 mt-4'>
+      <div className='flex flex-col gap-2 px-0 lg:px-24 md:px-12 mt-4'>
         {availability.map(({ day, opening_time, closing_time, isSelected }) => (
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-2 mb-4'>
             <div className='flex flex-row justify-between'>
               {day.charAt(0).toUpperCase() + day.slice(1)}
               <Switch
@@ -50,7 +50,7 @@ export default function WorkingHoursMiniPage() {
               </Switch>
             </div>
             { isSelected ? 
-              <div className='flex flex-row items-center gap-8'>
+              <div className='flex flex-col lg:flex-row md:flex-row items-center gap-2 lg:gap-8 md:gap-8'>
                 <div className='flex flex-col'>
                   <h1 className="form-label-alt">Choose delivery time</h1>
                   <input 

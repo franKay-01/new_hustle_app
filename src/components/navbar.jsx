@@ -338,7 +338,6 @@ export default function Navbar() {
               {Cookies.get("token") ? 
                 <>
                   {navigation.map((item) => (
-                    
                     <Disclosure.Button
                       key={item.name}
                       as="a"

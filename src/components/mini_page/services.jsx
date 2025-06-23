@@ -6,12 +6,12 @@ export default function ServicesMiniPage({handleOpenCreateService}) {
       <div className="flex flex-col p-2">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-xl font-regular">My services</h1>
-          <button onClick={() => handleOpenCreateService()} className="flex !w-[20%] view-more-button justify-center items-center mt-4">
+          <button onClick={() => handleOpenCreateService()} className="flex !w-[40%] lg:!w-[30%] md:!w-[30%] view-more-button justify-center items-center mt-4">
             <h1 className='view-more-button-text'>Add service</h1>
           </button>
         </div>
         <div className="flex flex-wrap gap-6 items-center mt-8">
-          <div className="flex flex-col border-2 w-[48%] border-gray-300 rounded-lg p-2">
+          <div className="flex flex-col border-2 w-[100%] lg:w-[48%] md:w-[48%] border-gray-300 rounded-lg p-2">
             <div className="flex flex-row justify-between items-center gap-4">
               <h1 className="text-xl font-semibold">Lash extension</h1>
               <h1 className="service-amount">GHS 1200.00</h1>
@@ -24,7 +24,7 @@ export default function ServicesMiniPage({handleOpenCreateService}) {
               <h1 className='view-more-button-text !text-[14px]'>View service</h1>
             </button>
           </div>
-          <div className="flex flex-col border-2 w-[48%] border-gray-300 rounded-lg p-2">
+          <div className="flex flex-col border-2 w-[100%] lg:w-[48%] md:w-[48%] border-gray-300 rounded-lg p-2">
             <div className="flex flex-row justify-between items-center gap-4">
               <h1 className="text-xl font-semibold">Lash extension</h1>
               <h1 className="service-amount">GHS 1200.00</h1>
@@ -37,7 +37,7 @@ export default function ServicesMiniPage({handleOpenCreateService}) {
               <h1 className='view-more-button-text !text-[14px]'>View service</h1>
             </button>
           </div>
-          <div className="flex flex-col border-2 w-[48%] border-gray-300 rounded-lg p-2">
+          <div className="flex flex-col border-2 w-[100%] lg:w-[48%] md:w-[48%] border-gray-300 rounded-lg p-2">
             <div className="flex flex-row justify-between items-center gap-4">
               <h1 className="text-xl font-semibold">Lash extension</h1>
               <h1 className="service-amount">GHS 1200.00</h1>

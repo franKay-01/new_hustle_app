@@ -131,8 +131,8 @@ export default function CreateServiceMiniPage({handleCloseCreateService}) {
         <h1 className="form-label mt-4">Upload supporting images</h1>
         <MediaUpload setOriginalSelectedFile={setSelectedFile}/>
 
-        <button className='flex !w-[30%] view-more-button justify-center items-center mt-4'>
-          <h1 className='view-more-button-text'>Save update</h1>
+        <button className='flex !w-[55%] lg:!w-[30%] md:!w-[30%] view-more-button justify-center items-center mt-4'>
+          <h1 className='view-more-button-text'>Save service</h1>
         </button>
         {/* <label className="proposal-label">{maxLength - text.length} characters left</label> */}
       </div>

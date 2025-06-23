@@ -87,10 +87,10 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Hustle details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
-            <button className='flex my-booking-button-alt-c justify-center items-center'>
+            <button className='hidden lg:flex md:flex my-booking-button-alt-c justify-center items-center'>
               <h1 className='booking-card-button-text booking-card-button-text-alt'>Raise an issue</h1>
             </button>
-            <button onClick={() => confirmHustle()} className='flex modal-more-button justify-center items-center'>
+            <button onClick={() => confirmHustle()} className='hidden lg:flex md:flex modal-more-button justify-center items-center'>
               <h1 className='modal-more-button-text'>Mark as completed</h1>
             </button>
             
@@ -216,11 +216,18 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
         <hr className='default'/>
         <div className="flex flex-col gap-2 p-3">
           <div className="flex flex-col">
-           
+            <div className="flex lg:hidden md:hidden flex-row gap-2 mb-4">
+              <button className='flex lg:hidden md:hidden my-booking-button-alt-c justify-center items-center'>
+                <h1 className='booking-card-button-text booking-card-button-text-alt'>Raise an issue</h1>
+              </button>
+              <button onClick={() => confirmHustle()} className='flex lg:hidden md:hidden modal-more-button justify-center items-center'>
+                <h1 className='modal-more-button-text'>Mark as completed</h1>
+              </button>
+            </div>
             <Badge status={activeKey} message={statusMsg} />
             <h1 className="view-more-header">Plumber needed for a bathroom fix for quick gigs</h1>
             { isApplied ? 
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-row gap-4 mt-2">
                 <h1 onClick={() => setJobDescription(true)} className={ jobDescription ? 'info-card-desc-mb info-card-desc' : 'info-card-desc'}>Job description</h1>
                 <h1 onClick={() => setJobDescription(false)} className={ jobDescription ? 'info-card-desc' : 'info-card-desc-mb info-card-desc'}>Your submission</h1>
               </div>

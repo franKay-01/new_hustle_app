@@ -756,6 +756,10 @@ hr.default {
     width: 86%;
     text-align: center;
   }
+
+  .modal-middle-main{
+    width: 90%;
+  }
 }
 
 /* Image Avator Upload */

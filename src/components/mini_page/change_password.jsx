@@ -20,14 +20,14 @@ export default function ChangePasswordMiniPage() {
           <label className="form-label mt-4">Confirm password</label>
           <input name="first_name" className="auth-input-box block" placeholder='new password' type="password"/>
 
-          <button onClick={() => setConfirm(false)} className='flex !w-[30%] view-more-button justify-center items-center mt-4'>
+          <button onClick={() => setConfirm(false)} className='flex !w-[55%] lg:!w-[20%] md:!w-[20%] view-more-button justify-center items-center mt-4'>
             <h1 className='view-more-button-text'>Change password</h1>
           </button>
         </div>
         :
         <div>
           <label className="form-label mt-1">Are you sure you want to change your password?</label>
-          <button className='flex !w-[30%] view-more-button justify-center items-center mt-4'>
+          <button className='flex !w-[80%] lg:!w-[20%] md:!w-[20%] view-more-button justify-center items-center mt-4'>
             <h1 className='view-more-button-text'>Yes, i want to change password</h1>
           </button>
         </div>

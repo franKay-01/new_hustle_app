@@ -6,7 +6,7 @@ export default function DeleteAccountModal({handleClose, show}) {
 
   return (
     <div className={showHideClassName}>
-      <section className="modal-middle-main !w-[50%]">
+      <section className="modal-middle-main !w-[90%] lg:!w-[50%] md:!w-[50%]">
         <div className="flex flex-col justify-center items-center gap-2 p-3">
           <h1 className="text-xl font-semibold text-[#CD0000]">Delete account</h1>
           <svg width="82" height="83" viewBox="0 0 82 83" fill="none" xmlns="http://www.w3.org/2000/svg">

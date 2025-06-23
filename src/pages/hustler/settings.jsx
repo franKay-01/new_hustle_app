@@ -39,9 +39,9 @@ export default function MyHustlesPage(){
         <Navbar />
         <div className="pl-5 pr-5 pt-2">
           <h1 className="text-xl font-regular">Settings</h1>
-          <div className="flex flex-row gap-4 mt-4">
-            <div className="booking-card flex flex-col w-[30%]">
-              <div className="h-screen w-full px-2">
+          <div className="flex flex-col lg:flex-row md:flex-row gap-4 mt-4">
+            <div className="booking-card flex flex-col w-[100%] lg:w-[30%] md:w-[30%]">
+              <div className="h-fit lg:h-screen md:h-screen w-full px-2">
                 <div className="flex flex-col gap-6 mx-auto w-full max-w-lg divide-y divide-white/5 rounded-xl bg-white/5">
                   <Disclosure as="div" defaultOpen={true}>
                     <Disclosure.Button className="group flex w-full items-center justify-between">

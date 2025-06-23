@@ -113,7 +113,7 @@ export default function ContantDetailsMiniPage() {
         </div>
         <textarea className='textarea-box' name="bio" id="" cols="6" rows="6"></textarea>
         
-        <button className='flex !w-[30%] view-more-button justify-center items-center mt-4'>
+        <button className='flex !w-[40%] lg:!w-[30%] md:!w-[30%] view-more-button justify-center items-center mt-4'>
           <h1 className='view-more-button-text'>Save update</h1>
         </button>
         {/* <label className="proposal-label">{maxLength - text.length} characters left</label> */}

@@ -20,7 +20,7 @@ export default function DeleteAccountMiniPage({ showDeleteModal }) {
           Need help? Contact Customer Support before proceeding.
         </p>
         
-        <button onClick={() => showDeleteModal()} className='flex !w-[30%] !bg-[#CD0000] view-more-button justify-center items-center mt-4'>
+        <button onClick={() => showDeleteModal()} className='flex !w-[55%] lg:!w-[30%] md:!w-[30%] !bg-[#CD0000] view-more-button justify-center items-center mt-4'>
           <h1 className='view-more-button-text'>Delete account</h1>
         </button>
       </div>
