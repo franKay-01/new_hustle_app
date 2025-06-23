@@ -82,7 +82,7 @@ export default function HustleDetailModal({handleClose, show, handleShowProposal
                 </button>
               </Popover.Button>
 
-              <Popover.Panel className="absolute right-0 top-7 z-10 mt-8 dropdown-margin">
+              <Popover.Panel className="absolute right-[-6rem] lg:right-0 md:right-0 top-7 z-10 mt-8 dropdown-margin">
                 <div className='flex flex-col menu-bar menu-bar-alt'>
                   <>
                     <h1 className="view-more-header">More</h1>
