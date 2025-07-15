@@ -77,7 +77,8 @@ export default function LoginPage(){
     const params = {
       "email": form.email,
       "password": form.password,
-      "device_token": device_token === undefined ? "WEB" : device_token
+      // "device_token": device_token === undefined ? "WEB" : device_token
+      "device_token": "WEB"
     }
 
     const {response_code, account, msg} = await hustleNormalLogin(params)
@@ -154,17 +155,17 @@ export default function LoginPage(){
   //   }
   // }
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      if (authUser) {
-        setUser(authUser)
-      } else {
-        setUser(null);
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+  //     if (authUser) {
+  //       setUser(authUser)
+  //     } else {
+  //       setUser(null);
+  //     }
+  //   });
   
-    return () => unsubscribe();
-  }, [])
+  //   return () => unsubscribe();
+  // }, [])
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2'>
@@ -220,7 +221,8 @@ export default function LoginPage(){
             <hr className='default'/>
           </div>
           <div className='flex justify-center mt-4'>
-            <button onClick={() => signInWithGoogle()} className='social-button flex flex-row items-center justify-center gap-2'>
+            {/* <button onClick={() => signInWithGoogle()} className='social-button flex flex-row items-center justify-center gap-2'> */}
+            <button className='social-button flex flex-row items-center justify-center gap-2'>
               <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_7326_113749)">
                 <path d="M8.86104 1.50251C6.46307 2.33438 4.39506 3.91332 2.96077 6.00738C1.52649 8.10145 0.801526 10.6003 0.892371 13.1368C0.983217 15.6734 1.88508 18.1139 3.4655 20.1C5.04591 22.0861 7.22158 23.5131 9.67292 24.1713C11.6603 24.6841 13.7424 24.7066 15.7404 24.2369C17.5504 23.8303 19.2238 22.9607 20.5967 21.7131C22.0256 20.375 23.0627 18.6728 23.5967 16.7894C24.177 14.7413 24.2803 12.5874 23.8985 10.4931H12.7385V15.1225H19.2017C19.0725 15.8609 18.7957 16.5656 18.3878 17.1944C17.98 17.8233 17.4494 18.3635 16.8279 18.7825C16.0387 19.3046 15.149 19.6558 14.216 19.8138C13.2803 19.9877 12.3205 19.9877 11.3848 19.8138C10.4364 19.6177 9.53923 19.2262 8.75042 18.6644C7.4832 17.7674 6.53168 16.493 6.03167 15.0231C5.52319 13.5257 5.52319 11.9024 6.03167 10.405C6.38759 9.35541 6.97598 8.39976 7.75292 7.60938C8.64203 6.68828 9.76766 6.02988 11.0063 5.7064C12.245 5.38292 13.5488 5.40688 14.7748 5.77563C15.7325 6.06962 16.6083 6.58326 17.3323 7.27563C18.061 6.55063 18.7885 5.82376 19.5148 5.09501C19.8898 4.70313 20.2985 4.33001 20.6679 3.92876C19.5627 2.90027 18.2654 2.09999 16.8504 1.57376C14.2736 0.638112 11.4541 0.612968 8.86104 1.50251Z" fill="white"/>
