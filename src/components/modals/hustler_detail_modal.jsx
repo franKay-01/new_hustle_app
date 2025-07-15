@@ -3,18 +3,90 @@ import { useNavigate, Link } from "react-router-dom";
 import ClientImg from "../../assets/images/client_img.svg"
 import { Popover } from '@headlessui/react'
 import CategoryImg from '../../assets/images/cat.png'
+import useHustleFunctions from "../../utils/hustles";
+import Loader from "../loader";
+import { ShowToast } from "../showToast";
+import NoInfoCard from "../no_info_card";
 
-export default function HustlerDetailModal({handleClose, show, handleShowServiceDetailsModal}) {
+export default function HustlerDetailModal({handleClose, show, handleShowServiceDetailsModal, hustler_uuid_info}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [activeView, setActiveView] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [isApplied, setIsApplied] = useState(true)
   const [jobDescription, setJobDescription] = useState("overview")
+  const [hustlerDetail, setHustlerDetail] = useState({})
+  const [savedWorkingHours, setSavedWorkingHours] = useState([])
+
+  const { getHustlerDetails, getAvailableTimes} = useHustleFunctions()
+  const history = useNavigate();
+
+  const formatHoursOnDays = (dayInfo) => {
+    const dayOrder = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+    const sortedAvailability = dayInfo.sort(
+      (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+    );
+
+    return sortedAvailability
+  }
 
   useEffect(() => {
-    if (show){
-      setActiveView(false)
-    }
+    const fetchData = async () => {
+      setIsLoading(true); // start loading
+  
+      try {
+        await Promise.all([
+          getHustlerAvailableTimes(),
+          getHuslterInfo()
+        ]);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setIsLoading(false); // end loading
+      }
+    };
+
+    fetchData()
   },[show])
+
+  const getHustlerAvailableTimes = async () => {
+    const {response_code, availableTimes} = await getAvailableTimes()
+    console.log("TIMES ",JSON.stringify(availableTimes))
+
+    if (response_code === 200){
+      if (availableTimes.length > 0){
+        setSavedWorkingHours(formatHoursOnDays(availableTimes))
+        return
+      }
+
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/')
+    }
+
+    ShowToast("error", "Hustler availability details not set.")
+    return
+  }
+
+  const getHuslterInfo = async () => {
+    const { response_code, hustler, msg} = await getHustlerDetails(hustler_uuid_info)
+    if (response_code === 200){
+      console.log(JSON.stringify(hustler))
+      setHustlerDetail(hustler)
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/creator/home')
+    }
+
+    ShowToast("error", msg)
+    return history('/creator/home')
+  }
 
   const hustle_url = "hello"
   const shareOnWhatsApp = () => {
@@ -71,7 +143,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
 
   return (
     <div className={showHideClassName}>
-      <section className="modal-main !bg-[#F5F5F5]">
+      <section className="modal-main !bg-[#F5F5F5] overflow-y-auto">
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
@@ -184,238 +256,217 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
         </div>
         <hr className='default'/>
         <div className="flex flex-col gap-2 p-3">
-          <div className="flex flex-col">
-            <div className="flex flex-col gap-2 lg:flex-row md:flex-row justify-between">
-              <div className="flex flex-row gap-2 items-center">
-                <img src={CategoryImg} className="icon-img w-16 h-16" alt="Client Image"/>
-                <div className="flex flex-col gap-1">
-                  <h1 className="view-more-header view-more-header-alt">Fred Amoah</h1>
-                  <h1 className="info-card-desc">Makeup Artist | NailTech | Lash Tech</h1>
-                  <div className="flex flex-row gap-1 items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
-                      <path fill-rule="evenodd" clip-rule="evenodd" d="M5.66716 5.16699C5.02382 5.16699 4.50049 5.69033 4.50049 6.33433C4.50049 6.97766 5.02382 7.50033 5.66716 7.50033C6.31049 7.50033 6.83382 6.97766 6.83382 6.33433C6.83382 5.69033 6.31049 5.16699 5.66716 5.16699M5.66716 8.50033C4.47249 8.50033 3.50049 7.52899 3.50049 6.33433C3.50049 5.13899 4.47249 4.16699 5.66716 4.16699C6.86182 4.16699 7.83382 5.13899 7.83382 6.33433C7.83382 7.52899 6.86182 8.50033 5.66716 8.50033" fill="#575757"/>
-                      <mask id="mask0_4444_3375" style={{ maskType:"luminance" }} maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="14">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.166992 0.833984H11.1667V13.834H0.166992V0.833984Z" fill="white"/>
-                      </mask>
-                      <g mask="url(#mask0_4444_3375)">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.6665 1.83398C3.18517 1.83398 1.1665 3.87198 1.1665 6.37598C1.1665 9.56198 4.91584 12.666 5.6665 12.8313C6.41717 12.6653 10.1665 9.56132 10.1665 6.37598C10.1665 3.87198 8.14784 1.83398 5.6665 1.83398V1.83398ZM5.6665 13.834C4.4705 13.834 0.166504 10.1327 0.166504 6.37598C0.166504 3.31998 2.63384 0.833984 5.6665 0.833984C8.69917 0.833984 11.1665 3.31998 11.1665 6.37598C11.1665 10.1327 6.8625 13.834 5.6665 13.834V13.834Z" fill="#575757"/>
-                      </g>
+          { isLoading ?
+            <Loader />
+            :
+            <div className="flex flex-col">
+              <div className="flex flex-col gap-2 lg:flex-row md:flex-row justify-between">
+                <div className="flex flex-row gap-2 items-center">
+                  <img src={CategoryImg} className="icon-img w-16 h-16" alt="Client Image"/>
+                  <div className="flex flex-col gap-1">
+                    <h1 className="view-more-header view-more-header-alt">{hustlerDetail.full_name}</h1>
+                    <h1 className="info-card-desc">Makeup Artist | NailTech | Lash Tech</h1>
+                    <div className="flex flex-row gap-1 items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.66716 5.16699C5.02382 5.16699 4.50049 5.69033 4.50049 6.33433C4.50049 6.97766 5.02382 7.50033 5.66716 7.50033C6.31049 7.50033 6.83382 6.97766 6.83382 6.33433C6.83382 5.69033 6.31049 5.16699 5.66716 5.16699M5.66716 8.50033C4.47249 8.50033 3.50049 7.52899 3.50049 6.33433C3.50049 5.13899 4.47249 4.16699 5.66716 4.16699C6.86182 4.16699 7.83382 5.13899 7.83382 6.33433C7.83382 7.52899 6.86182 8.50033 5.66716 8.50033" fill="#575757"/>
+                        <mask id="mask0_4444_3375" style={{ maskType:"luminance" }} maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="14">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M0.166992 0.833984H11.1667V13.834H0.166992V0.833984Z" fill="white"/>
+                        </mask>
+                        <g mask="url(#mask0_4444_3375)">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M5.6665 1.83398C3.18517 1.83398 1.1665 3.87198 1.1665 6.37598C1.1665 9.56198 4.91584 12.666 5.6665 12.8313C6.41717 12.6653 10.1665 9.56132 10.1665 6.37598C10.1665 3.87198 8.14784 1.83398 5.6665 1.83398V1.83398ZM5.6665 13.834C4.4705 13.834 0.166504 10.1327 0.166504 6.37598C0.166504 3.31998 2.63384 0.833984 5.6665 0.833984C8.69917 0.833984 11.1665 3.31998 11.1665 6.37598C11.1665 10.1327 6.8625 13.834 5.6665 13.834V13.834Z" fill="#575757"/>
+                        </g>
+                      </svg>
+                      <p className="info-card-desc">{hustlerDetail.contact_info?.country}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 items-start lg:items-end md:items-end">
+                  <h1 className="view-more-header !text-[16px] !text-[#0A4F42]">From GHS 20.00/hr</h1>
+                  <div className="flex flex-row items-center">
+                    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.72913 1.54492L12.1162 6.38091L17.4544 7.16116L13.5917 10.9233L14.5033 16.2383L9.72913 13.7276L4.95494 16.2383L5.86652 10.9233L2.00391 7.16116L7.34204 6.38091L9.72913 1.54492Z" fill="#EBA100"/>
                     </svg>
-                    <p className="info-card-desc">Ghana</p>
+                    <h1 className="info-card-desc !text-[15.5px]">{hustlerDetail.hustler_stats?.average_rating} ({hustlerDetail.hustler_stats?.completed_hustles_no} completed hustles)</h1>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-2 items-start lg:items-end md:items-end">
-                <h1 className="view-more-header !text-[16px] !text-[#0A4F42]">From GHS 20.00/hr</h1>
-                <div className="flex flex-row items-start">
-                  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.72913 1.54492L12.1162 6.38091L17.4544 7.16116L13.5917 10.9233L14.5033 16.2383L9.72913 13.7276L4.95494 16.2383L5.86652 10.9233L2.00391 7.16116L7.34204 6.38091L9.72913 1.54492Z" fill="#EBA100"/>
-                  </svg>
-                  <h1 className="info-card-desc !text-[15.5px]">4.6 (10 completed hustles)</h1>
+              { isApplied ? 
+                <div className="flex flex-row gap-8 mt-4">
+                  <h1 onClick={() => setJobDescription('overview')} className={`${jobDescription === 'overview' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Overview</h1>
+                  <h1 onClick={() => setJobDescription('services')} className={`${jobDescription === 'services' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Services</h1>
+                  <h1 onClick={() => setJobDescription('hustle_history')} className={`${jobDescription === 'hustle_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Hustles history</h1>
+                  <h1 onClick={() => setJobDescription('review_history')} className={`${jobDescription === 'review_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Reviews history</h1>
                 </div>
-              </div>
+                :
+                null
+              }
+
+              { jobDescription === 'overview' ?
+                <>
+                  <h1 className='modal-header-text-alt !text-[#0A4F42] mt-4'>Who is {hustlerDetail.full_name}?</h1>
+                  <h1 className="info-card-desc">
+                    {hustlerDetail.contact_info?.bio ? hustlerDetail.contact_info?.bio : "The bio is currently blank — maybe they like to keep things mysterious."}
+                  </h1>
+
+                  <h1 className='modal-header-text-alt mt-4'>Skills & expertise</h1>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">Youtube Editor</h1>
+                    </div>
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">Youtube Editor</h1>
+                    </div>
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">Youtube Editor</h1>
+                    </div>
+                  </div>
+
+                  <h1 className='modal-header-text-alt mt-4'>Working hours</h1>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-row gap-20 items-center">
+                      <h1 className="info-card-desc w-[40px]">Monday</h1>
+                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Tuesday</h1>
+                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Wednesday</h1>
+                      <h1 className="info-card-desc items-start">09:00am - 5:30pm</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Thursday</h1>
+                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Friday</h1>
+                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Saturday</h1>
+                      <h1 className="info-card-desc">Closed</h1>
+                    </div>
+                    <div className="flex flex-row gap-20">
+                      <h1 className="info-card-desc w-[40px]">Sunday</h1>
+                      <h1 className="info-card-desc">Closed</h1>
+                    </div>
+                  </div>
+                </>
+                : null
+              }
+
+              { jobDescription === 'services' ? 
+                <div className="flex flex-wrap gap-4 mt-4">
+                  { hustlerDetail.projects.length > 0 ?
+                    <>
+                      { hustlerDetail.projects.map((item, index) => {
+                        return <div key={index} className="flex flex-col border-2 w-[100%] lg:w-[48%] md:w-[48%] border-gray-300 rounded-lg p-2">
+                          <div className="flex flex-row justify-between items-center gap-4">
+                            <h1 className="text-xl font-semibold">{item.project_name}</h1>
+                            <h1 className="service-amount">GHS {item.proposed_amount.toFixed(2)}</h1>
+                          </div>
+                          <img src={item.project_img ? item.project_img : CategoryImg} alt="" className='object-cover rounded-lg h-[10rem] w-full mt-2' />
+                          <h1 className='font-regular text-[#535B65] mt-2 line-clamp-2'>
+                          {item.project_desc}
+                          </h1>
+                          <button onClick={() => handleShowServiceDetailsModal(item)} className="flex !bg-[#387D70] !w-[40%] view-more-button justify-center items-center mt-4">
+                            <h1 className='view-more-button-text !text-[14px]'>View service</h1>
+                          </button>
+                        </div>
+                      })}
+                    </>:
+                    <NoInfoCard header={'No services available'} message={'All services will be displayed here'}/>
+                  }
+                    
+                </div> : null
+              }
+
+              { jobDescription === 'hustle_history' ?
+                <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
+                  <div className="info-card">
+                    <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
+                      style={{ backgroundImage: `url(${CategoryImg})` }}
+                    ></div>
+                    <div className="px-4 py-2">
+                      <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
+                      <h1 className="info-card-desc info-card-ellipsis">
+                        Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
+                      </h1>
+                      <div className="grid grid-cols-3 mt-2">
+                        <div>
+                          <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
+                          <h1 className="info-card-text-color">Beginner</h1>
+                        </div>
+                        <div>
+                          <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
+                          <h1 className="info-card-text-color">3 weeks</h1>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="info-card">
+                    <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
+                      style={{ backgroundImage: `url(${CategoryImg})` }}
+                    ></div>
+                    <div className="px-4 py-2">
+                      <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
+                      <h1 className="info-card-desc info-card-ellipsis">
+                        Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
+                      </h1>
+                      <div className="grid grid-cols-3 mt-2">
+                        <div>
+                          <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
+                          <h1 className="info-card-text-color">Beginner</h1>
+                        </div>
+                        <div>
+                          <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
+                          <h1 className="info-card-text-color">3 weeks</h1>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                : null
+              }
+
+              { jobDescription === 'review_history' ?
+                <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
+                  { hustlerDetail.reviews.length > 0 ?
+                    <>
+                      { hustlerDetail.reviews.map((item, index) => {
+                        return <div key={index} className="info-card flex flex-col px-4 py-2">
+                          <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
+                          <h1 className="info-card-header !font-normal underline">{item.creator?.full_name}</h1>
+                          <div className="flex flex-row justify-between mt-1">
+                            <div className="flex flex-row gap-2">
+                              <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.00016 1.3335L10.0602 5.50683L14.6668 6.18016L11.3335 9.42683L12.1202 14.0135L8.00016 11.8468L3.88016 14.0135L4.66683 9.42683L1.3335 6.18016L5.94016 5.50683L8.00016 1.3335Z" fill="#EBA100"/>
+                                <path d="M24.0002 1.3335L26.0602 5.50683L30.6668 6.18016L27.3335 9.42683L28.1202 14.0135L24.0002 11.8468L19.8802 14.0135L20.6668 9.42683L17.3335 6.18016L21.9402 5.50683L24.0002 1.3335Z" fill="#EBA100"/>
+                                <path d="M40.0002 1.3335L42.0602 5.50683L46.6668 6.18016L43.3335 9.42683L44.1202 14.0135L40.0002 11.8468L35.8802 14.0135L36.6668 9.42683L33.3335 6.18016L37.9402 5.50683L40.0002 1.3335Z" fill="#EBA100"/>
+                                <path d="M56.0002 1.3335L58.0602 5.50683L62.6668 6.18016L59.3335 9.42683L60.1202 14.0135L56.0002 11.8468L51.8802 14.0135L52.6668 9.42683L49.3335 6.18016L53.9402 5.50683L56.0002 1.3335Z" fill="#EBA100"/>
+                                <path d="M72.0002 1.3335L74.0602 5.50683L78.6668 6.18016L75.3335 9.42683L76.1202 14.0135L72.0002 11.8468L67.8802 14.0135L68.6668 9.42683L65.3335 6.18016L69.9402 5.50683L72.0002 1.3335Z" fill="#EBA100"/>
+                              </svg>
+                              <h1 className="info-card-desc !text-[12.5px]">{item.rating.toFixed(1)}</h1>
+                            </div>
+                            <h1 className="info-card-desc !text-[12.5px]">{item.posted_at}</h1>
+                          </div>
+                          <h1 className="info-card-desc">
+                            {item.comment}
+                          </h1>
+                        </div>
+                      })}
+                    </>
+                    :
+                    <>
+                      <NoInfoCard header={'No reviews available'} message={'All reviews will be displayed here.'}/>
+                    </>
+                  }
+                </div>:null
+              }
+              
             </div>
-            { isApplied ? 
-              <div className="flex flex-row gap-8 mt-4">
-                <h1 onClick={() => setJobDescription('overview')} className={`${jobDescription === 'overview' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Overview</h1>
-                <h1 onClick={() => setJobDescription('services')} className={`${jobDescription === 'services' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Services</h1>
-                <h1 onClick={() => setJobDescription('hustle_history')} className={`${jobDescription === 'hustle_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Hustles history</h1>
-                <h1 onClick={() => setJobDescription('review_history')} className={`${jobDescription === 'review_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Reviews history</h1>
-              </div>
-              :
-              null
-            }
-
-            { jobDescription === 'overview' ?
-              <>
-                <h1 className='modal-header-text-alt !text-[#0A4F42] mt-4'>Who is William Howard Taft?</h1>
-                <h1 className="info-card-desc">
-                  A multi-talented beauty professional offering nail care, lash enhancements, and flawless makeup artistry — all in one. With an eye for detail and a passion for elevating confidence, I deliver personalized beauty experiences tailored to your unique features and preferences.
-                  Whether you’re getting ready for a special occasion, a shoot, or just treating yourself, I’m here to bring out your best glow — from polished nails to dramatic lashes to a camera-ready beat. Hygiene, quality products, and client comfort are my top priorities.
-                  Book one service or bundle all three for the ultimate beauty transformation
-                </h1>
-
-                <h1 className='modal-header-text-alt mt-4'>Skills & expertise</h1>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">Youtube Editor</h1>
-                  </div>
-                  <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">Youtube Editor</h1>
-                  </div>
-                  <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">Youtube Editor</h1>
-                  </div>
-                </div>
-
-                <h1 className='modal-header-text-alt mt-4'>Working hours</h1>
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-row gap-20 items-center">
-                    <h1 className="info-card-desc w-[40px]">Monday</h1>
-                    <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Tuesday</h1>
-                    <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Wednesday</h1>
-                    <h1 className="info-card-desc items-start">09:00am - 5:30pm</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Thursday</h1>
-                    <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Friday</h1>
-                    <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Saturday</h1>
-                    <h1 className="info-card-desc">Closed</h1>
-                  </div>
-                  <div className="flex flex-row gap-20">
-                    <h1 className="info-card-desc w-[40px]">Sunday</h1>
-                    <h1 className="info-card-desc">Closed</h1>
-                  </div>
-                </div>
-              </>
-              : null
-            }
-
-            { jobDescription === 'services' ? 
-              <div className="flex flex-wrap gap-4 mt-4">
-                <div className="flex flex-col border-2 w-[100%] lg:w-[48%] md:w-[48%] border-gray-300 rounded-lg p-2">
-                  <div className="flex flex-row justify-between items-center gap-4">
-                    <h1 className="text-xl font-semibold">Lash extension</h1>
-                    <h1 className="service-amount">GHS 1200.00</h1>
-                  </div>
-                  <img src={CategoryImg} alt="" className='object-cover rounded-lg h-[10rem] w-full mt-2' />
-                  <h1 className='flex flex-wrap font-regular text-[#535B65] mt-2'>
-                  Looking for were you will do your lashes be it hybris, volume or classic, we are here for you
-                  </h1>
-                  <button onClick={() => handleShowServiceDetailsModal()} className="flex !bg-[#387D70] !w-[40%] view-more-button justify-center items-center mt-4">
-                    <h1 className='view-more-button-text !text-[14px]'>View service</h1>
-                  </button>
-                </div>
-                
-              </div> : null
-            }
-
-            { jobDescription === 'hustle_history' ?
-              <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
-                <div className="info-card">
-                  <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
-                    style={{ backgroundImage: `url(${CategoryImg})` }}
-                  ></div>
-                  <div className="px-4 py-2">
-                    <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
-                    <h1 className="info-card-desc info-card-ellipsis">
-                      Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
-                    </h1>
-                    <div className="grid grid-cols-3 mt-2">
-                      <div>
-                        <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
-                        <h1 className="info-card-text-color">Beginner</h1>
-                      </div>
-                      <div>
-                        <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                        <h1 className="info-card-text-color">3 weeks</h1>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="info-card">
-                  <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
-                    style={{ backgroundImage: `url(${CategoryImg})` }}
-                  ></div>
-                  <div className="px-4 py-2">
-                    <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
-                    <h1 className="info-card-desc info-card-ellipsis">
-                      Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
-                    </h1>
-                    <div className="grid grid-cols-3 mt-2">
-                      <div>
-                        <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
-                        <h1 className="info-card-text-color">Beginner</h1>
-                      </div>
-                      <div>
-                        <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                        <h1 className="info-card-text-color">3 weeks</h1>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              : null
-            }
-
-            { jobDescription === 'review_history' ?
-              <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
-                <div className="info-card flex flex-col px-4 py-2">
-                  <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
-                  <h1 className="info-card-header !font-normal underline">Dan Holmes</h1>
-                  <div className="flex flex-row justify-between mt-1">
-                    <div className="flex flex-row gap-2">
-                      <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8.00016 1.3335L10.0602 5.50683L14.6668 6.18016L11.3335 9.42683L12.1202 14.0135L8.00016 11.8468L3.88016 14.0135L4.66683 9.42683L1.3335 6.18016L5.94016 5.50683L8.00016 1.3335Z" fill="#EBA100"/>
-                        <path d="M24.0002 1.3335L26.0602 5.50683L30.6668 6.18016L27.3335 9.42683L28.1202 14.0135L24.0002 11.8468L19.8802 14.0135L20.6668 9.42683L17.3335 6.18016L21.9402 5.50683L24.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M40.0002 1.3335L42.0602 5.50683L46.6668 6.18016L43.3335 9.42683L44.1202 14.0135L40.0002 11.8468L35.8802 14.0135L36.6668 9.42683L33.3335 6.18016L37.9402 5.50683L40.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M56.0002 1.3335L58.0602 5.50683L62.6668 6.18016L59.3335 9.42683L60.1202 14.0135L56.0002 11.8468L51.8802 14.0135L52.6668 9.42683L49.3335 6.18016L53.9402 5.50683L56.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M72.0002 1.3335L74.0602 5.50683L78.6668 6.18016L75.3335 9.42683L76.1202 14.0135L72.0002 11.8468L67.8802 14.0135L68.6668 9.42683L65.3335 6.18016L69.9402 5.50683L72.0002 1.3335Z" fill="#EBA100"/>
-                      </svg>
-                      <h1 className="info-card-desc !text-[12.5px]">4.6</h1>
-                    </div>
-                    <h1 className="info-card-desc !text-[12.5px]">4 days ago</h1>
-                  </div>
-                  <h1 className="info-card-desc">
-                    Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
-                  </h1>
-                </div>
-                <div className="info-card flex flex-col px-4 py-2">
-                  <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
-                  <h1 className="info-card-header !font-normal underline">Dan Holmes</h1>
-                  <div className="flex flex-row justify-between mt-1">
-                    <div className="flex flex-row gap-2">
-                      <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8.00016 1.3335L10.0602 5.50683L14.6668 6.18016L11.3335 9.42683L12.1202 14.0135L8.00016 11.8468L3.88016 14.0135L4.66683 9.42683L1.3335 6.18016L5.94016 5.50683L8.00016 1.3335Z" fill="#EBA100"/>
-                        <path d="M24.0002 1.3335L26.0602 5.50683L30.6668 6.18016L27.3335 9.42683L28.1202 14.0135L24.0002 11.8468L19.8802 14.0135L20.6668 9.42683L17.3335 6.18016L21.9402 5.50683L24.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M40.0002 1.3335L42.0602 5.50683L46.6668 6.18016L43.3335 9.42683L44.1202 14.0135L40.0002 11.8468L35.8802 14.0135L36.6668 9.42683L33.3335 6.18016L37.9402 5.50683L40.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M56.0002 1.3335L58.0602 5.50683L62.6668 6.18016L59.3335 9.42683L60.1202 14.0135L56.0002 11.8468L51.8802 14.0135L52.6668 9.42683L49.3335 6.18016L53.9402 5.50683L56.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M72.0002 1.3335L74.0602 5.50683L78.6668 6.18016L75.3335 9.42683L76.1202 14.0135L72.0002 11.8468L67.8802 14.0135L68.6668 9.42683L65.3335 6.18016L69.9402 5.50683L72.0002 1.3335Z" fill="#EBA100"/>
-                      </svg>
-                      <h1 className="info-card-desc !text-[12.5px]">4.6</h1>
-                    </div>
-                    <h1 className="info-card-desc !text-[12.5px]">4 days ago</h1>
-                  </div>
-                  <h1 className="info-card-desc">
-                    Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
-                  </h1>
-                </div>
-                <div className="info-card flex flex-col px-4 py-2">
-                  <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
-                  <h1 className="info-card-header !font-normal underline">Dan Holmes</h1>
-                  <div className="flex flex-row justify-between mt-1">
-                    <div className="flex flex-row gap-2">
-                      <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8.00016 1.3335L10.0602 5.50683L14.6668 6.18016L11.3335 9.42683L12.1202 14.0135L8.00016 11.8468L3.88016 14.0135L4.66683 9.42683L1.3335 6.18016L5.94016 5.50683L8.00016 1.3335Z" fill="#EBA100"/>
-                        <path d="M24.0002 1.3335L26.0602 5.50683L30.6668 6.18016L27.3335 9.42683L28.1202 14.0135L24.0002 11.8468L19.8802 14.0135L20.6668 9.42683L17.3335 6.18016L21.9402 5.50683L24.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M40.0002 1.3335L42.0602 5.50683L46.6668 6.18016L43.3335 9.42683L44.1202 14.0135L40.0002 11.8468L35.8802 14.0135L36.6668 9.42683L33.3335 6.18016L37.9402 5.50683L40.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M56.0002 1.3335L58.0602 5.50683L62.6668 6.18016L59.3335 9.42683L60.1202 14.0135L56.0002 11.8468L51.8802 14.0135L52.6668 9.42683L49.3335 6.18016L53.9402 5.50683L56.0002 1.3335Z" fill="#EBA100"/>
-                        <path d="M72.0002 1.3335L74.0602 5.50683L78.6668 6.18016L75.3335 9.42683L76.1202 14.0135L72.0002 11.8468L67.8802 14.0135L68.6668 9.42683L65.3335 6.18016L69.9402 5.50683L72.0002 1.3335Z" fill="#EBA100"/>
-                      </svg>
-                      <h1 className="info-card-desc !text-[12.5px]">4.6</h1>
-                    </div>
-                    <h1 className="info-card-desc !text-[12.5px]">4 days ago</h1>
-                  </div>
-                  <h1 className="info-card-desc">
-                    Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
-                  </h1>
-                </div>
-              </div>:null
-            }
-            
-          </div>
+          }
         </div>
       </section>
     </div>

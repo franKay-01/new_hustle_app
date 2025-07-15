@@ -3,12 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import ClientImg from "../../assets/images/client_img.svg"
 import { Popover } from '@headlessui/react'
 import CategoryImg from '../../assets/images/cat.png'
+import NoInfoCard from "../no_info_card";
 
-export default function ServiceDetailsModal({handleClose, show, handleShowHustleDetailModal}) {
+export default function ServiceDetailsModal({handleClose, show, handleShowHustleDetailModal, service}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [activeView, setActiveView] = useState(false)
 
   useEffect(() => {
+    console.log(JSON.stringify(service))
     if (show){
       setActiveView(false)
     }
@@ -69,7 +71,7 @@ export default function ServiceDetailsModal({handleClose, show, handleShowHustle
 
   return (
     <div className={showHideClassName}>
-      <section className="modal-main !bg-[#F5F5F5]">
+      <section className="modal-main !bg-[#F5F5F5] overflow-y-auto">
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Service Details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
@@ -223,23 +225,26 @@ export default function ServiceDetailsModal({handleClose, show, handleShowHustle
         <div className="flex flex-col gap-2 p-3">
           <div className="flex flex-col">
             <div className="flex flex-row justify-between items-center">
-              <h1 className='modal-header-text'>Lash Extension Classic</h1>
+              <h1 className='modal-header-text'>{service.project_name}</h1>
               <div className="flex flex-col">
-                <h1 className="modal-header-text !text-[13px]">GHS 100.00</h1>
-                <h1 className="modal-header-text !text-[13px]">30 mins</h1>
+                <h1 className="modal-header-text !text-[13px]">GHS {service.proposed_amount.toFixed(2)}</h1>
+                <h1 className="modal-header-text !text-[13px]">{service.proposed_duration} hrs</h1>
               </div>
             </div>
             <h1 className="info-card-desc mt-8">
-              A multi-talented beauty professional offering nail care, lash enhancements, and flawless makeup artistry — all in one. With an eye for detail and a passion for elevating confidence, I deliver personalized beauty experiences tailored to your unique features and preferences.
-              Whether you’re getting ready for a special occasion, a shoot, or just treating yourself, I’m here to bring out your best glow — from polished nails to dramatic lashes to a camera-ready beat. Hygiene, quality products, and client comfort are my top priorities.
-              Book one service or bundle all three for the ultimate beauty transformation
+              {service.project_desc}
             </h1>
-            <div className="flex flex-wrap gap-2 mt-8">
-              <img src={CategoryImg} />
-              <img src={CategoryImg} />
-              <img src={CategoryImg} />
-              <img src={CategoryImg} />
-            </div>
+              { service.media.length > 0 ?
+                <div className="flex flex-wrap gap-2 mt-8">
+                  {service.media.map((item, index) => {
+                    return <img className="w-32 h-24" src={item.media_url} />
+                  })}
+                </div>
+                :
+                <div className="flex justify-center items-center">
+                  <NoInfoCard header={'No extra media added'} message={'All extra media data will how here'}/>
+                </div>
+              }
           </div>
         </div>
       </section>

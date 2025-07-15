@@ -18,7 +18,7 @@ function App() {
   return (
     <React.Suspense fallback={"...loading"}>
       <Routes>
-        {/* <Route element={<ProtectedRoute />}> */}
+        <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage/>}/>
           <Route path="/myHustles" element={<MyHustlesPage/>}/>
           <Route path="/settings" element={<SettingsPage/>}/>
@@ -26,7 +26,7 @@ function App() {
 
           <Route path="/creator/home" element={<CreatorHomePage/>}/>
           <Route path="/creator/hustles" element={<MyCreatorHustlesPage/>}/>
-        {/* </Route> */}
+        </Route>
         <Route path="/auth" element={<AuthPage/>}/>
         <Route path="/register" element={<RegisterPage/>}/>
         <Route path="/register_details" element={<RegisterDetailsPage/>}/>

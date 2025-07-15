@@ -1,4 +1,5 @@
 import { useLocation, Link} from 'react-router-dom';
+import Cookies from 'js-cookie'
 
 export default function Sidebar() {
   const location = useLocation();
@@ -9,14 +10,14 @@ export default function Sidebar() {
       <aside className="w-64 bg-[#003C2F] text-white hidden lg:flex md:hidden flex-col">
         <div className="p-6 text-2xl font-bold">Hustle.io</div>
         <nav className="flex flex-col space-y-2 px-4 text-left">
-          <Link to={'/'} className={`${route === '/' || route === '/creator/home' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
+          <Link to={Cookies.get('is_ct') ? '/creator/home' : '/'} className={`${route === '/' || route === '/creator/home' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M7.51602 2.36667L3.02435 5.86667C2.27435 6.45 1.66602 7.69167 1.66602 8.63334V14.8083C1.66602 16.7417 3.24102 18.325 5.17435 18.325H14.8244C16.7577 18.325 18.3327 16.7417 18.3327 14.8167V8.75C18.3327 7.74167 17.6577 6.45 16.8327 5.875L11.6827 2.26667C10.516 1.45 8.64102 1.49167 7.51602 2.36667Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M10 14.9917V12.4917" stroke="#F3E4C8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <h1 className="sidebar-label">My Feed</h1>
           </Link>
-          <Link to={'/myHustles'} className={`${route === '/myHustles' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
+          <Link to={Cookies.get('is_ct') ? '/creator/hustles' : '/myHustles'} className={`${route === '/myHustles' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.0827 9.41674V5.86676C17.0827 2.50842 16.2993 1.66675 13.1493 1.66675H6.84935C3.69935 1.66675 2.91602 2.50842 2.91602 5.86676V15.2501C2.91602 17.4667 4.13269 17.9917 5.60769 16.4084L5.61601 16.4001C6.29934 15.6751 7.34101 15.7334 7.93267 16.5251L8.77435 17.6501" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M6.66602 5.83325H13.3327" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

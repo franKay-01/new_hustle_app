@@ -1,22 +1,171 @@
 import { useState, useEffect } from 'react'
-import bgImage from '../../assets/images/login_img.png'
+import Cookies from 'js-cookie';
 import logo from '../../assets/images/logo_alt.png'
 import login_img from '../../assets/images/login_image.png'
-import { Link } from 'react-router-dom';
-import Select from 'react-select';
 import useAuthFunctions from '../../utils/authentication';
 import { ShowToast } from '../../components/showToast';
+import useFunctions from '../../utils/functions';
+import { useNavigate, Link } from 'react-router-dom';
+import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
+import { generateToken, auth} from "../../notifications/firebase"
+
 
 export default function LoginPage(){
   const [form, setForm] = useState({email: '', password: ''})
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const { hustleSocialRegister, hustleNormalRegister, hustleNormalLogin, getAllCountries, hustleSocialLogin } = useAuthFunctions()
+  const { hustleNormalLogin, hustleSocialLogin } = useAuthFunctions()
+  const { createCookies } = useFunctions()
+
+  const history = useNavigate();
 
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
 	}
+
+  const checkLocation = () => {
+    if (navigator.geolocation) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted') {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              
+              Cookies.set("latitude", latitude)
+              Cookies.set("longitude", longitude)
+            }
+          );
+        }else if (result.state === 'prompt') {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              
+              Cookies.set("latitude", latitude)
+              Cookies.set("longitude", longitude)
+            },
+            (error) => {
+              ShowToast("error", `Error getting geolocation: ${error}`);
+            }
+          );
+        }else{
+          console.log('Location access denied');
+          ShowToast("error", "NB: Your location is turned off. Job searches may not be accurate")
+          return
+        }
+      })
+    }
+  }
+
+  const login = async () => {
+    setIsLoginLoading(true)
+    
+    if (!form.email || !form.password){
+      setIsLoginLoading(false)
+      ShowToast("error", "Please provide valid credentails")
+      return
+    }
+
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    let device_token;
+
+    if (!isMobile){
+      device_token = await generateToken();
+    }
+    
+    const params = {
+      "email": form.email,
+      "password": form.password,
+      "device_token": device_token === undefined ? "WEB" : device_token
+    }
+
+    const {response_code, account, msg} = await hustleNormalLogin(params)
+
+    checkLocation()
+
+    if (response_code === 200){
+      setIsLoginLoading(false)
+
+      createCookies(account.token, account.full_name, account.contact_info?.country, 
+        account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
+        account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
+        account.contact_info.avatar, form.email)
+
+      switch (account.is_creator){
+        case false:
+          return history('/')
+        default:
+          return history('/creator/home')
+      }
+    }else{
+      setIsLoginLoading(false)
+      ShowToast("error", msg)
+      return
+    }
+  }
+
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      await submitSocialAccountLogin()
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const submitSocialAccountLogin = async () => {
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    let device_token;
+
+    if (!isMobile){
+      device_token = await generateToken();
+    }
+
+    const params = {
+      'email': user.email,
+      'provider_id': user.uid,
+      'social_uid': user.providerData[0].uid,
+      "device_token": device_token === undefined ? "WEB" : device_token
+    }
+
+    checkLocation()
+
+    const {response_code, account} = await hustleSocialLogin(params)
+    if (response_code === 200){
+      setIsLoginLoading(false)
+      
+      createCookies(account.token, account.full_name, account?.contact_info?.country, 
+        account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
+        account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
+        account.contact_info.avatar, form.email)
+      
+      switch (account.is_creator){
+        case false:
+          return history('/')
+        default:
+          return history('/requester/home')
+      }
+    }else{
+      setIsLoginLoading(false)
+      ShowToast("error", "Account creation from social account failed. Try again!")
+      return
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        setUser(authUser)
+      } else {
+        setUser(null);
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [])
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2'>
@@ -36,7 +185,7 @@ export default function LoginPage(){
         <div className="grid grid-cols-1 gap-2 px-4 lg:px-28 md:px-12 mt-4">
           <div>
             <label className="form-label mt-1 mb-2">Enter Email</label>
-            <input onChange={handleChange} value={form.first_name} name="first_name" 
+            <input onChange={handleChange} value={form.first_name} name="email" 
             className="auth-input-box block" type="text"/>
           </div>
           <div className='relative'>
@@ -52,11 +201,18 @@ export default function LoginPage(){
             </svg>
           </div> 
           <p className='forgot-password-p underline'>Forgotten password?</p>
-          <button className='flex register-card-button justify-center items-center mt-4'>
-            <h1 className='register-card-h1'>Sign in</h1>
-          </button>
+          { isLoginLoading ? 
+            <button className='flex register-card-button justify-center items-center mt-4'>
+              <h1 className='register-card-h1'>... loading</h1>
+            </button>
+            :
+            <button onClick={() => login()} className='flex cursor-pointer register-card-button justify-center items-center mt-4'>
+              <h1 className='register-card-h1'>Sign in</h1>
+            </button>
+          }
+          
           <h1 className="auth-card-p auth-card-p-alt mt-4">Don’t have an account as a Hustle Creator?
-            <Link to={'/login'} className="register-account-link cursor-pointer ml-1">Create an account here</Link>
+            <Link to={'/register'} className="register-account-link cursor-pointer ml-1">Create an account here</Link>
           </h1>
 
           <div className='flex flex-row gap-1 items-center justify-center mt-4'>
@@ -65,7 +221,7 @@ export default function LoginPage(){
             <hr className='default'/>
           </div>
           <div className='flex justify-center mt-4'>
-            <button className='social-button flex flex-row items-center justify-center gap-2'>
+            <button onClick={() => signInWithGoogle()} className='social-button flex flex-row items-center justify-center gap-2'>
               <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_7326_113749)">
                 <path d="M8.86104 1.50251C6.46307 2.33438 4.39506 3.91332 2.96077 6.00738C1.52649 8.10145 0.801526 10.6003 0.892371 13.1368C0.983217 15.6734 1.88508 18.1139 3.4655 20.1C5.04591 22.0861 7.22158 23.5131 9.67292 24.1713C11.6603 24.6841 13.7424 24.7066 15.7404 24.2369C17.5504 23.8303 19.2238 22.9607 20.5967 21.7131C22.0256 20.375 23.0627 18.6728 23.5967 16.7894C24.177 14.7413 24.2803 12.5874 23.8985 10.4931H12.7385V15.1225H19.2017C19.0725 15.8609 18.7957 16.5656 18.3878 17.1944C17.98 17.8233 17.4494 18.3635 16.8279 18.7825C16.0387 19.3046 15.149 19.6558 14.216 19.8138C13.2803 19.9877 12.3205 19.9877 11.3848 19.8138C10.4364 19.6177 9.53923 19.2262 8.75042 18.6644C7.4832 17.7674 6.53168 16.493 6.03167 15.0231C5.52319 13.5257 5.52319 11.9024 6.03167 10.405C6.38759 9.35541 6.97598 8.39976 7.75292 7.60938C8.64203 6.68828 9.76766 6.02988 11.0063 5.7064C12.245 5.38292 13.5488 5.40688 14.7748 5.77563C15.7325 6.06962 16.6083 6.58326 17.3323 7.27563C18.061 6.55063 18.7885 5.82376 19.5148 5.09501C19.8898 4.70313 20.2985 4.33001 20.6679 3.92876C19.5627 2.90027 18.2654 2.09999 16.8504 1.57376C14.2736 0.638112 11.4541 0.612968 8.86104 1.50251Z" fill="white"/>

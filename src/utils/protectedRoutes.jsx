@@ -8,7 +8,7 @@ const ProtectedRoute = () => {
       <Outlet />
     )
   }
-  return !!fakeAuth ? builder() : <Navigate to='/auth' />
+  return !!fakeAuth ? builder() : <Navigate to='/login' />
 }
 
 export default ProtectedRoute

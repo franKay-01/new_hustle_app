@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import bgImage from '../../assets/images/login_img.png'
+import Cookies from 'js-cookie';
 import logo from '../../assets/images/logo_alt.png'
 import register_img from '../../assets/images/register_detail.png'
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import useAuthFunctions from '../../utils/authentication';
 import { ShowToast } from '../../components/showToast';
+import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
+import useCheckPasswordFunction from "../../utils/checkPassword";
 
 export default function RegisterDetailsPage(){
   const [form, setForm] = useState({email: '', password: '', confirm_password: '', time_zone: ''})
@@ -13,8 +15,11 @@ export default function RegisterDetailsPage(){
   const [countries, setCountries] = useState([])
   const [originalCountries, setOriginalCountries] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [accountOption, setAccountOption] = useState('')
+  const [user, setUser] = useState(null);
 
   const { hustleSocialRegister, hustleNormalRegister, hustleNormalLogin, getAllCountries, hustleSocialLogin } = useAuthFunctions()
+  const { checkPassword } = useCheckPasswordFunction()
 
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
@@ -22,6 +27,141 @@ export default function RegisterDetailsPage(){
 
   const filterCountriesByName = (value) =>{
     return originalCountries.filter(country => country.name.toLowerCase().includes(value.toLowerCase()));
+  }
+
+  const checkLocation = () => {
+    if (navigator.geolocation) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted') {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              
+              Cookies.set("latitude", latitude)
+              Cookies.set("longitude", longitude)
+            }
+          );
+        }else if (result.state === 'prompt') {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              
+              Cookies.set("latitude", latitude)
+              Cookies.set("longitude", longitude)
+            },
+            (error) => {
+              ShowToast("error", `Error getting geolocation: ${error}`);
+            }
+          );
+        }else{
+          console.log('Location access denied');
+          ShowToast("error", "NB: Your location is turned off. Job searches may not be accurate")
+          return
+        }
+      })
+    }
+  }
+  
+//   const createAccount = async () => {
+//     setIsLoading(true)
+
+//     const null_response = areAnyValuesEmpty()
+//     if (null_response){
+//       setIsLoading(false)
+//       ShowToast("error", "All fields are required")
+//       return
+//     }
+
+//     if (!isValidEmail(form.email)) {
+//       setIsLoading(false)
+//       ShowToast("error", "Email format is wrong. Check and try again")
+//       return
+//     }
+
+//     if (form.password !== form.confirm_password){
+//       setIsLoading(false)
+//       ShowToast("error", "Password does not match. Check and try again")
+//       return
+//     }
+
+//     const checkPasswordStrength = await checkPassword(form.password)
+//     if (!checkPasswordStrength){
+//       setIsLoading(false)
+//       ShowToast("error", "Password strength is poor. Check and try again")
+//       return
+//     }
+
+//     checkLocation()
+
+//     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+//     let device_token;
+
+//     if (!isMobile){
+//       device_token = await generateToken();
+//     }
+
+//     if (Cookies.get("longitude") === undefined){
+//       setIsLoading(false)
+//       if (Cookies.get('isAskedToSetLocation') === undefined){
+//         Cookies.set("isAskedToSetLocation", true)
+//         ShowToast("error", "Your location can not be verified. Close the site and revisit. Allow permission for location")
+//         return
+//       }
+//     }
+
+//     const params = {
+//       "email": form.email,
+//       "country_of_residence": selectedOption.value,
+//       "password": form.password,
+//       "time_zone": form.time_zone,
+//       "is_creator": accountOption ? true : false,
+//       "longitude": Cookies.get("longitude") === undefined ? '-0.13317282646417278' : Cookies.get("longitude"),
+//       "latitude": Cookies.get("latitude") === undefined ? '5.720534560359222' : Cookies.get("latitude"),
+//       "src": "WEB",
+//       "device_token": device_token === undefined ? "WEB" : device_token
+//     }
+
+//     const {response_code, account, msg} = await hustleNormalRegister(params)
+//     if (response_code === 200){
+//       setIsLoading(false)
+
+//       createCookies(account.token, account.full_name, account?.contact_info?.country, 
+//         account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
+//         account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
+//         account.contact_info.avatar)
+      
+//       goToPageThree()
+//       return
+//     }
+    
+//     setIsLoading(false)
+//     ShowToast("error", msg)
+//     return
+//   }
+
+  const createCookies = (token, full_name, country_of_residence, has_verified_email, 
+    has_verified_id_details, has_verified_business_details, is_ct, pid, hustler_uuid, avatar) => {
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    Cookies.set("token", token, { expires: new Date(Date.now() + oneWeek)})
+    Cookies.set("email", form.email)
+    Cookies.set('hid', pid)
+    Cookies.set("full_name", full_name)
+    Cookies.set("residence", country_of_residence ? country_of_residence : '----')
+    Cookies.set("email_verified", has_verified_email)
+    Cookies.set("has_verified_id_details", has_verified_id_details)
+    Cookies.set("has_verified_business_details", has_verified_business_details)
+    Cookies.set("is_ct", is_ct)
+    Cookies.set("huid", hustler_uuid)
+    Cookies.set("avatar", avatar)
+    return
+  }
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return emailRegex.test(email);
   }
 
   const getCountries = async () => {
@@ -101,7 +241,16 @@ export default function RegisterDetailsPage(){
   };
   
   useEffect(() => {
+    // const { state } = location;
+    // if (state === null){
+      
+    // }
+    // const { data } = state;
+    // const { accountType } = data;
+
+    // setAccountOption(accountType)
     getCountries()
+
     // const unsubscribe = onAuthStateChanged(auth, (authUser) => {
     //   if (authUser) {
     //     setUser(authUser)

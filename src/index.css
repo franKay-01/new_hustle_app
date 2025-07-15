@@ -670,6 +670,10 @@ hr.default {
   padding: 1rem;
 }
 
+.info-card-alt{
+  width: 22.5rem;
+}
+
 .custom-toast {
   display: flex;
   align-items: center;
@@ -681,6 +685,10 @@ hr.default {
 
 .auth-input-box-date{
   width: auto !important;
+}
+
+.auth-input-box-date-alt{
+  display: block !important;
 }
 
 .setting-heading{
