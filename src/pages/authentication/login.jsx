@@ -6,9 +6,8 @@ import useAuthFunctions from '../../utils/authentication';
 import { ShowToast } from '../../components/showToast';
 import useFunctions from '../../utils/functions';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
-import { generateToken, auth} from "../../notifications/firebase"
-
+// import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
+// import { generateToken, auth} from "../../notifications/firebase"
 
 export default function LoginPage(){
   const [form, setForm] = useState({email: '', password: ''})
@@ -68,12 +67,12 @@ export default function LoginPage(){
       return
     }
 
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    let device_token;
+    // const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // let device_token;
 
-    if (!isMobile){
-      device_token = await generateToken();
-    }
+    // if (!isMobile){
+    //   device_token = await generateToken();
+    // }
     
     const params = {
       "email": form.email,
@@ -106,54 +105,54 @@ export default function LoginPage(){
     }
   }
 
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      await submitSocialAccountLogin()
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
+  // const signInWithGoogle = async () => {
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     await signInWithPopup(auth, provider);
+  //     await submitSocialAccountLogin()
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // };
 
-  const submitSocialAccountLogin = async () => {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    let device_token;
+  // const submitSocialAccountLogin = async () => {
+  //   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  //   let device_token;
 
-    if (!isMobile){
-      device_token = await generateToken();
-    }
+  //   if (!isMobile){
+  //     device_token = await generateToken();
+  //   }
 
-    const params = {
-      'email': user.email,
-      'provider_id': user.uid,
-      'social_uid': user.providerData[0].uid,
-      "device_token": device_token === undefined ? "WEB" : device_token
-    }
+  //   const params = {
+  //     'email': user.email,
+  //     'provider_id': user.uid,
+  //     'social_uid': user.providerData[0].uid,
+  //     "device_token": device_token === undefined ? "WEB" : device_token
+  //   }
 
-    checkLocation()
+  //   checkLocation()
 
-    const {response_code, account} = await hustleSocialLogin(params)
-    if (response_code === 200){
-      setIsLoginLoading(false)
+  //   const {response_code, account} = await hustleSocialLogin(params)
+  //   if (response_code === 200){
+  //     setIsLoginLoading(false)
       
-      createCookies(account.token, account.full_name, account?.contact_info?.country, 
-        account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
-        account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
-        account.contact_info.avatar, form.email)
+  //     createCookies(account.token, account.full_name, account?.contact_info?.country, 
+  //       account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
+  //       account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
+  //       account.contact_info.avatar, form.email)
       
-      switch (account.is_creator){
-        case false:
-          return history('/')
-        default:
-          return history('/requester/home')
-      }
-    }else{
-      setIsLoginLoading(false)
-      ShowToast("error", "Account creation from social account failed. Try again!")
-      return
-    }
-  }
+  //     switch (account.is_creator){
+  //       case false:
+  //         return history('/')
+  //       default:
+  //         return history('/requester/home')
+  //     }
+  //   }else{
+  //     setIsLoginLoading(false)
+  //     ShowToast("error", "Account creation from social account failed. Try again!")
+  //     return
+  //   }
+  // }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
