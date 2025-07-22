@@ -122,6 +122,7 @@ const useAuthFunctions = () => {
   const hustleNormalLogin = async (params) => {
     try {
       const {data, status} = await executeReq('hustler/login', params)
+
       if (status === 403 || status === 401){
         logout()   
         return {response_code: 401} 

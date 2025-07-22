@@ -2,24 +2,27 @@ import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie';
 import logo from '../../assets/images/logo_alt.png'
 import register_img from '../../assets/images/register_detail.png'
-import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import useAuthFunctions from '../../utils/authentication';
 import { ShowToast } from '../../components/showToast';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
 import useCheckPasswordFunction from "../../utils/checkPassword";
+import { useNavigate, Link, useLocation} from 'react-router-dom';
 
 export default function RegisterDetailsPage(){
-  const [form, setForm] = useState({email: '', password: '', confirm_password: '', time_zone: ''})
+  const [form, setForm] = useState({first_name: '', last_name: '', email: '', password: '', confirm_password: '', time_zone: ''})
   const [selectedOption, setSelectedOption] = useState(null);
   const [countries, setCountries] = useState([])
   const [originalCountries, setOriginalCountries] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [accountOption, setAccountOption] = useState('')
+  const [accountOption, setAccountOption] = useState(false)
   const [user, setUser] = useState(null);
 
-  const { hustleSocialRegister, hustleNormalRegister, hustleNormalLogin, getAllCountries, hustleSocialLogin } = useAuthFunctions()
+  const { hustleSocialRegister, hustleNormalRegister, getAllCountries } = useAuthFunctions()
   const { checkPassword } = useCheckPasswordFunction()
+
+  const history = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
@@ -63,84 +66,95 @@ export default function RegisterDetailsPage(){
       })
     }
   }
+
+  const areAnyValuesEmpty = () => {
+    return Object.entries(form).some(([key, value]) => value === '');
+  };
   
-//   const createAccount = async () => {
-//     setIsLoading(true)
+  const createAccount = async () => {
+    setIsLoading(true)
 
-//     const null_response = areAnyValuesEmpty()
-//     if (null_response){
-//       setIsLoading(false)
-//       ShowToast("error", "All fields are required")
-//       return
-//     }
+    const null_response = areAnyValuesEmpty()
+    if (null_response){
+      setIsLoading(false)
+      ShowToast("error", "All fields are required")
+      return
+    }
 
-//     if (!isValidEmail(form.email)) {
-//       setIsLoading(false)
-//       ShowToast("error", "Email format is wrong. Check and try again")
-//       return
-//     }
+    if (!isValidEmail(form.email)) {
+      setIsLoading(false)
+      ShowToast("error", "Email format is wrong. Check and try again")
+      return
+    }
 
-//     if (form.password !== form.confirm_password){
-//       setIsLoading(false)
-//       ShowToast("error", "Password does not match. Check and try again")
-//       return
-//     }
+    if (form.password !== form.confirm_password){
+      setIsLoading(false)
+      ShowToast("error", "Password does not match. Check and try again")
+      return
+    }
 
-//     const checkPasswordStrength = await checkPassword(form.password)
-//     if (!checkPasswordStrength){
-//       setIsLoading(false)
-//       ShowToast("error", "Password strength is poor. Check and try again")
-//       return
-//     }
+    const checkPasswordStrength = await checkPassword(form.password)
+    if (!checkPasswordStrength){
+      setIsLoading(false)
+      ShowToast("error", "Password strength is poor. Check and try again")
+      return
+    }
 
-//     checkLocation()
+    checkLocation()
 
-//     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-//     let device_token;
+    // let device_token;
 
-//     if (!isMobile){
-//       device_token = await generateToken();
-//     }
+    // if (!isMobile){
+    //   device_token = await generateToken();
+    // }
 
-//     if (Cookies.get("longitude") === undefined){
-//       setIsLoading(false)
-//       if (Cookies.get('isAskedToSetLocation') === undefined){
-//         Cookies.set("isAskedToSetLocation", true)
-//         ShowToast("error", "Your location can not be verified. Close the site and revisit. Allow permission for location")
-//         return
-//       }
-//     }
+    if (Cookies.get("longitude") === undefined){
+      setIsLoading(false)
+      if (Cookies.get('isAskedToSetLocation') === undefined){
+        Cookies.set("isAskedToSetLocation", true)
+        ShowToast("error", "Your location can not be verified. Close the site and revisit. Allow permission for location")
+        return
+      }
+    }
 
-//     const params = {
-//       "email": form.email,
-//       "country_of_residence": selectedOption.value,
-//       "password": form.password,
-//       "time_zone": form.time_zone,
-//       "is_creator": accountOption ? true : false,
-//       "longitude": Cookies.get("longitude") === undefined ? '-0.13317282646417278' : Cookies.get("longitude"),
-//       "latitude": Cookies.get("latitude") === undefined ? '5.720534560359222' : Cookies.get("latitude"),
-//       "src": "WEB",
-//       "device_token": device_token === undefined ? "WEB" : device_token
-//     }
+    const params = {
+      "first_name": form.first_name,
+      "last_name": form.last_name,
+      "email": form.email,
+      "country_of_residence": selectedOption.value,
+      "password": form.password,
+      "time_zone": form.time_zone,
+      "is_creator": accountOption ? true : false,
+      "longitude": Cookies.get("longitude") === undefined ? '-0.13317282646417278' : Cookies.get("longitude"),
+      "latitude": Cookies.get("latitude") === undefined ? '5.720534560359222' : Cookies.get("latitude"),
+      "src": "WEB",
+      // "device_token": device_token === undefined ? "WEB" : device_token
+      "device_token": "WEB"
+    }
 
-//     const {response_code, account, msg} = await hustleNormalRegister(params)
-//     if (response_code === 200){
-//       setIsLoading(false)
+    const {response_code, account, msg} = await hustleNormalRegister(params)
+    if (response_code === 200){
+      setIsLoading(false)
 
-//       createCookies(account.token, account.full_name, account?.contact_info?.country, 
-//         account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
-//         account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
-//         account.contact_info.avatar)
+      createCookies(account.token, account.full_name, account?.contact_info?.country, 
+        account.verified_details.has_verified_email, account.verified_details.has_verified_id_details, 
+        account.verified_details.has_verified_business_details, account.is_creator, account.id, account.hustler_uuid,
+        account.contact_info.avatar)
       
-//       goToPageThree()
-//       return
-//     }
+      switch (account.is_creator){
+        case false:
+          return history('/')
+        default:
+          return history('/creator/home')
+      }
+    }
     
-//     setIsLoading(false)
-//     ShowToast("error", msg)
-//     return
-//   }
+    setIsLoading(false)
+    ShowToast("error", msg)
+    return
+  }
 
   const createCookies = (token, full_name, country_of_residence, has_verified_email, 
     has_verified_id_details, has_verified_business_details, is_ct, pid, hustler_uuid, avatar) => {
@@ -185,23 +199,6 @@ export default function RegisterDetailsPage(){
     return
   }
 
-  const colourStyles = {
-    control: styles => ({ ...styles, backgroundColor: 'white' }),
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-      const color = data.color;
-      return {
-        ...styles,
-        backgroundColor: "#fff",
-        color: '#006666',
-        cursor: isDisabled ? 'not-allowed' : 'default',
-        "&:hover": {
-          backgroundColor: "#006666",
-          color: '#fff',
-        }
-      };
-    },
-  };
-
   const customStyles = {
     control: (base, state) => ({
       ...base,
@@ -241,14 +238,18 @@ export default function RegisterDetailsPage(){
   };
   
   useEffect(() => {
-    // const { state } = location;
+    const { state } = location;
     // if (state === null){
       
     // }
-    // const { data } = state;
-    // const { accountType } = data;
+    const { data } = state;
+    const { accountType } = data[0];
 
-    // setAccountOption(accountType)
+    if (accountType.hustler){
+      setAccountOption(false)
+    }else{
+      setAccountOption(true)
+    }
     getCountries()
 
     // const unsubscribe = onAuthStateChanged(auth, (authUser) => {
@@ -285,14 +286,24 @@ export default function RegisterDetailsPage(){
         <div className='flex flex-col pt-12 lg:pt-4 md:pt-4 items-center'>
           <img src={logo} alt="logo" className='auth-card-img'/>
 
-          <h1 className='register-card-header mt-4'>Sign up as a Hustle Creator</h1>
+          <h1 className='register-card-header mt-4'>Sign up as a {`${accountOption ? 'Hustle Creator' : 'Hustler'}`}</h1>
           <p className='register-card-p mt-2'>This is where your journey begins. Let’s get you in.</p>
         
         </div>
         <div className="grid grid-cols-1 gap-2 px-4 lg:px-28 md:px-12 mt-4">
+          <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4'>
+            <div className='relative'>
+              <label className="form-label mt-4">Enter First Name</label>
+              <input onChange={handleChange} value={form.first_name} name="first_name" className="auth-input-box block" type="text"/>
+            </div>
+            <div className='relative'>
+              <label className="form-label mt-4">Enter Last Name</label>
+              <input onChange={handleChange} value={form.last_name} name="last_name" className="auth-input-box block" type="text"/>
+            </div>    
+          </div>
           <div>
             <label className="form-label mt-1 mb-2">Enter Email</label>
-            <input onChange={handleChange} value={form.first_name} name="first_name" 
+            <input onChange={handleChange} value={form.email} name="email" 
             className="auth-input-box block" type="text"/>
           </div>
           <div>
@@ -333,10 +344,17 @@ export default function RegisterDetailsPage(){
             </div>    
           </div>
           <p className='register-card-p-alt register-card-p'>By clicking ‘Create my account’ you are agreeing to Hustle’s 
-            <span className='text-[#0542D4] ml-1 font-[400]'>Terms</span> and <span className='text-[#0542D4] font-[400]'>privacy policy</span>.</p>     
-          <button className='flex register-card-button justify-center items-center mt-4'>
-            <h1 className='register-card-h1'>Create my account</h1>
-          </button>
+          <span className='text-[#0542D4] ml-1 font-[400]'>Terms</span> and <span className='text-[#0542D4] font-[400]'>privacy policy</span>.</p>
+          { isLoading ?
+            <button className='flex register-card-button justify-center items-center mt-4'>
+              <h1 className='register-card-h1'>...loading</h1>
+            </button>
+            :
+            <button onClick={createAccount} className='flex register-card-button justify-center items-center mt-4'>
+             <h1 className='register-card-h1'>Create my account</h1>
+            </button>
+          }
+          
           <h1 className="auth-card-p auth-card-p-alt mt-4">Already have an account as a  Hustle Creator?
             <Link to={'/login'} className="register-account-link cursor-pointer ml-1">Sign in here</Link>
           </h1>
@@ -367,8 +385,6 @@ export default function RegisterDetailsPage(){
           </div>
         </div>
       </div>
-      
-      
     </div>
   )
 }

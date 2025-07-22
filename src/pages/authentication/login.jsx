@@ -59,6 +59,7 @@ export default function LoginPage(){
   }
 
   const login = async () => {
+    console.log("FORM HERE")
     setIsLoginLoading(true)
     
     if (!form.email || !form.password){
@@ -146,7 +147,7 @@ export default function LoginPage(){
   //       case false:
   //         return history('/')
   //       default:
-  //         return history('/requester/home')
+  //         return history('/creator/home')
   //     }
   //   }else{
   //     setIsLoginLoading(false)

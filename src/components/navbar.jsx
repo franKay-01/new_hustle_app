@@ -23,7 +23,7 @@ export default function Navbar() {
 
     if (Cookies.get("token") && Cookies.get('is_ct') === 'true') {
       setNavigation([ 
-        { name: 'My Feed', href: '/requester/home', current: false },
+        { name: 'My Feed', href: '/creator/home', current: false },
         { name: 'My Hustles', href: '/requester/hustles', current: false },
         { name: 'Create Hustle', href: '/requester/add/hustle', current: false },
       ])

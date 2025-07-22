@@ -12,6 +12,8 @@ import useFunctions from "../../utils/functions";
 import { ShowToast } from "../../components/showToast";
 import NoInfoCard from "../../components/no_info_card";
 import Loader from "../../components/loader";
+import NoImgIcon from "../../assets/images/client_img.svg"
+import { useNavigate } from "react-router-dom"
 
 export default function HomePage(){
   const [showHustleDetailsModal, setShowHustleDetailModal] = useState(false)
@@ -20,9 +22,12 @@ export default function HomePage(){
   const [isLoading, setIsLoading] = useState(false)
   const [allHustles, setAllHustles] = useState([])
   const [allCategories, setAllCategories] = useState([])
+  const [allTopHustlers, setAllTopHustlers] = useState([])
+
+  const history = useNavigate();
 
   const { getAllCategories } = useFunctions()
-  const { retrieveAllHustles } = useHustleFunctions()
+  const { retrieveAllHustles, getTopHustlers} = useHustleFunctions()
 
   const handleShowProposal = () => {
 
@@ -44,6 +49,21 @@ export default function HomePage(){
     return
   }
 
+  const getAllTopHustlersAround = async () => {
+    const { response_code, top_hustlers, msg} = await getTopHustlers()
+    if (response_code === 200) {
+      setAllTopHustlers(top_hustlers)
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/auth')
+    }
+
+    ShowToast("error", msg)
+    return history('/creator/home')
+  }
 
   const getAllHustles = async () => {
 
@@ -66,7 +86,8 @@ export default function HomePage(){
       try {
         await Promise.all([
           getAllHustles(),
-          getCategories()
+          getCategories(),
+          getAllTopHustlersAround()
         ]);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -199,62 +220,22 @@ export default function HomePage(){
                 <div>
                   <h1 className="main-header mb-2 mt-4">Top Hustlers</h1>
                   <div className="flex flex-col gap-4 overflow-y-auto whitespace-nowrap">
-                    <div className="info-card flex flex-col justify-center items-center px-12 py-4">
-                      <img src={CategoryImg} className="icon-img w-12 h-12"/>
-                      <h1 className="info-card-header">William Howard Taft</h1>
-                      <div className="flex flex-row items-center gap-1">
-                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11.1325 12.7343H4.86582C4.58582 12.7343 4.27249 12.5143 4.17916 12.2476L1.41916 4.52763C1.02582 3.42096 1.48582 3.08096 2.43249 3.76096L5.03249 5.62096C5.46582 5.92096 5.95916 5.76763 6.14582 5.28096L7.31916 2.1543C7.69249 1.1543 8.31249 1.1543 8.68582 2.1543L9.85916 5.28096C10.0458 5.76763 10.5392 5.92096 10.9658 5.62096L13.4058 3.88096C14.4458 3.1343 14.9458 3.5143 14.5192 4.72096L11.8258 12.261C11.7258 12.5143 11.4125 12.7343 11.1325 12.7343Z" fill="#FDBA40"/>
-                          <path d="M4.33301 14.7476H11.6663" stroke="#FDBA40" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M6.33301 9.41455H9.66634" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h1 className="info-card-desc">Accra</h1>
+                    {allTopHustlers.length > 0 ? 
+                      <>
+                        {allTopHustlers.map((item, index) => {
+                          return  <div key={index} className="info-card flex flex-col justify-center items-center px-12 py-4">
+                            <img src={item.avatar ? item.avatar : NoImgIcon} className="icon-img w-12 h-12"/>
+                            <h1 className="info-card-header">{item.full_name}</h1>
+                            <h1 className="info-card-desc">Memeber since: {item.member_since}</h1>
+                            <h1 className="info-card-desc">({item.stats.completed_hustles} hustles completed)</h1>
+                          </div>
+                        })}
+                      </>
+                      :
+                      <div className="flex justify-center">
+                        <NoInfoCard header={'Top hustlers not available'} message={'All available hustlers will be displayed here'}/>
                       </div>
-                      <h1 className="info-card-desc">Lash tech</h1>
-                      <h1 className="info-card-desc">(10 hustles completed)</h1>
-                    </div>
-                    <div className="info-card flex flex-col justify-center items-center px-12 py-4">
-                      <img src={CategoryImg} className="icon-img w-12 h-12"/>
-                      <h1 className="info-card-header">William Howard Taft</h1>
-                      <div className="flex flex-row items-center gap-1">
-                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11.1325 12.7343H4.86582C4.58582 12.7343 4.27249 12.5143 4.17916 12.2476L1.41916 4.52763C1.02582 3.42096 1.48582 3.08096 2.43249 3.76096L5.03249 5.62096C5.46582 5.92096 5.95916 5.76763 6.14582 5.28096L7.31916 2.1543C7.69249 1.1543 8.31249 1.1543 8.68582 2.1543L9.85916 5.28096C10.0458 5.76763 10.5392 5.92096 10.9658 5.62096L13.4058 3.88096C14.4458 3.1343 14.9458 3.5143 14.5192 4.72096L11.8258 12.261C11.7258 12.5143 11.4125 12.7343 11.1325 12.7343Z" fill="#FDBA40"/>
-                          <path d="M4.33301 14.7476H11.6663" stroke="#FDBA40" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M6.33301 9.41455H9.66634" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h1 className="info-card-desc">Accra</h1>
-                      </div>
-                      <h1 className="info-card-desc">Lash tech</h1>
-                      <h1 className="info-card-desc">(10 hustles completed)</h1>
-                    </div>
-                    <div className="info-card flex flex-col justify-center items-center px-12 py-4">
-                      <img src={CategoryImg} className="icon-img w-12 h-12"/>
-                      <h1 className="info-card-header">William Howard Taft</h1>
-                      <div className="flex flex-row items-center gap-1">
-                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11.1325 12.7343H4.86582C4.58582 12.7343 4.27249 12.5143 4.17916 12.2476L1.41916 4.52763C1.02582 3.42096 1.48582 3.08096 2.43249 3.76096L5.03249 5.62096C5.46582 5.92096 5.95916 5.76763 6.14582 5.28096L7.31916 2.1543C7.69249 1.1543 8.31249 1.1543 8.68582 2.1543L9.85916 5.28096C10.0458 5.76763 10.5392 5.92096 10.9658 5.62096L13.4058 3.88096C14.4458 3.1343 14.9458 3.5143 14.5192 4.72096L11.8258 12.261C11.7258 12.5143 11.4125 12.7343 11.1325 12.7343Z" fill="#FDBA40"/>
-                          <path d="M4.33301 14.7476H11.6663" stroke="#FDBA40" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M6.33301 9.41455H9.66634" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h1 className="info-card-desc">Accra</h1>
-                      </div>
-                      <h1 className="info-card-desc">Lash tech</h1>
-                      <h1 className="info-card-desc">(10 hustles completed)</h1>
-                    </div>
-                    <div className="info-card flex flex-col justify-center items-center px-12 py-4">
-                      <img src={CategoryImg} className="icon-img w-12 h-12"/>
-                      <h1 className="info-card-header">William Howard Taft</h1>
-                      <div className="flex flex-row items-center gap-1">
-                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11.1325 12.7343H4.86582C4.58582 12.7343 4.27249 12.5143 4.17916 12.2476L1.41916 4.52763C1.02582 3.42096 1.48582 3.08096 2.43249 3.76096L5.03249 5.62096C5.46582 5.92096 5.95916 5.76763 6.14582 5.28096L7.31916 2.1543C7.69249 1.1543 8.31249 1.1543 8.68582 2.1543L9.85916 5.28096C10.0458 5.76763 10.5392 5.92096 10.9658 5.62096L13.4058 3.88096C14.4458 3.1343 14.9458 3.5143 14.5192 4.72096L11.8258 12.261C11.7258 12.5143 11.4125 12.7343 11.1325 12.7343Z" fill="#FDBA40"/>
-                          <path d="M4.33301 14.7476H11.6663" stroke="#FDBA40" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M6.33301 9.41455H9.66634" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <h1 className="info-card-desc">Accra</h1>
-                      </div>
-                      <h1 className="info-card-desc">Lash tech</h1>
-                      <h1 className="info-card-desc">(10 hustles completed)</h1>
-                    </div>
+                    }
                   </div>
                 </div>
               </div>

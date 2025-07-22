@@ -69,6 +69,7 @@ const useHustleFunctions = () => {
   const getTopHustlers = async () => {
     try{
       const {data, status} = await executeGet(`hustler/top-hustlers`)
+      console.log("DATA ", JSON.stringify(data))
 
       if (status === 403 || status === 401){
         logout()   
@@ -365,6 +366,7 @@ const useHustleFunctions = () => {
   const getAllHustlers = async () => {
     try {
       const {data, status} = await executeGet(`hustler/hustlers`)
+      console.log("DATA ", JSON.stringify(status))
       if (status === 403 || status === 401){
         logout()   
         return {response_code: 401} 
