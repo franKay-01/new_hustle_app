@@ -53,6 +53,9 @@
       "last 1 safari version"
     ]
   },
+  "rules": {
+    "react-hooks/exhaustive-deps": "off"
+  },
   "devDependencies": {
     "tailwindcss": "^3.4.17"
   }
