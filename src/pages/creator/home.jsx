@@ -22,13 +22,14 @@ export default function CreatorHomePage(){
   const [allCategories, setAllCategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [allHustlers, setAllHustlers] = useState([])
+  const [allTopHustlers, setAllTopHustlers] = useState([])
   const [selectedHustler, setSelectedHustler] = useState('')
   const [selectedService, setSelectedService] = useState({})
 
   const history = useNavigate();
 
   const { getAllCategories } = useFunctions()
-  const { getAllHustlers } = useHustleFunctions()
+  const { getAllHustlers, getTopHustlers } = useHustleFunctions()
 
   const getCategories = async () => {
     const {response_code, categories} = await getAllCategories()
@@ -39,6 +40,22 @@ export default function CreatorHomePage(){
 
     ShowToast("error", "Category details not loaded. Check internet connection and try again")
     return
+  }
+
+  const getAllTopHustlersAround = async () => {
+    const { response_code, top_hustlers, msg} = await getTopHustlers()
+    if (response_code === 200) {
+      setAllTopHustlers(top_hustlers)
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/requester/home')
+    }
+
+    ShowToast("error", msg)
+    return history('/requester/home')
   }
 
   const getAllHustlersAround = async () => {
@@ -70,6 +87,7 @@ export default function CreatorHomePage(){
       try {
         await Promise.all([
           getAllHustlersAround(),
+          getAllTopHustlersAround(),
           getCategories()
         ]);
       } catch (error) {

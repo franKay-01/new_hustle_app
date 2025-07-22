@@ -66,6 +66,23 @@ const useHustleFunctions = () => {
     }
   }
 
+  const getTopHustlers = async () => {
+    try{
+      const {data, status} = await executeGet(`hustler/top-hustlers`)
+
+      if (status === 403 || status === 401){
+        logout()   
+        return {response_code: 401} 
+      }
+
+      if (data.status === true){
+        return { response_code: 200, top_hustlers: data.data }
+      }
+    }catch{
+      return {response_code: 201, msg: "Top Hustler details retrival failed. Please try again in a few minutes"}
+    }
+  }
+
   const searchHusltesAround = async (params) => {
     try {
       const {data, status} = await executeReq(`hustles/search-hustles`, params)
@@ -608,7 +625,8 @@ const useHustleFunctions = () => {
     updateHustleStatus, updateHustlerAvailabilityStatus, bookHustler, submitBookedResponse,
     updateHustlerRating, getHustlerDetails, getWalletTransactions, retrieveVirtualCardDetails,
     createVirtualCard, editCardDetails, searchHuslterAround, searchHusltesAround, saveHustle,
-    unSaveHustle, getSavedHustles, getAvailableTimes, createHustlerWorkingHours, updateHustlerWorkingHours}
+    unSaveHustle, getSavedHustles, getAvailableTimes, createHustlerWorkingHours, updateHustlerWorkingHours,
+    getTopHustlers}
 }
 
 export default useHustleFunctions
