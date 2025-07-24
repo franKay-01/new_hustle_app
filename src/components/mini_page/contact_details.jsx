@@ -1,10 +1,36 @@
 import $ from 'jquery'; 
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import { Listbox, Transition, Switch } from '@headlessui/react'
+import TagInput from 'react-materialui-tag-input'
+import useFunctions from '../../utils/functions';
+import useUploadFunction from '../../utils/imageFileUpload';  
+import { ShowToast } from '../showToast';
+import useHustleFunctions from '../../utils/hustles';
+import Loader from '../loader';
 
 export default function ContantDetailsMiniPage() {
   const [idImg, setIdImg] = useState("")
   const [categorySelected, setCategorySelected] = useState("")
+  const [allCategories, setAllCategories] = useState([])
+  const [inputTags, setInputTags] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { getAllCategories } = useFunctions()
+
+  const getCategories = async () => {
+    setIsLoading(true)
+
+    const {response_code, categories} = await getAllCategories()
+    if (response_code === 200){
+      setIsLoading(false)
+      setAllCategories(categories)
+      return
+    }
+
+    setIsLoading(false)
+    ShowToast("error", "Country details not loaded. Check internet connection and try again")
+    return
+  }
 
   const readURL = () => {
     let input = document.getElementById('userImage')
@@ -23,13 +49,10 @@ export default function ContantDetailsMiniPage() {
     }
   }
 
-  const allCategories = [
-    { id: 1, name: 'Durward Reynolds' },
-    { id: 2, name: 'Kenton Towne' },
-    { id: 3, name: 'Therese Wunsch' },
-    { id: 4, name: 'Benedict Kessler' },
-    { id: 5, name: 'Katelyn Rohan' },
-  ]
+
+  useEffect(() => {
+    getCategories()
+  }, [])
 
   return (
     <div className="flex flex-col p-2">
@@ -76,7 +99,7 @@ export default function ContantDetailsMiniPage() {
                         active ? 'bg-green-900 text-white' : 'text-gray-900'
                       }`
                     }
-                    value={option.name}
+                    value={option.category_name}
                   >
                     {({ categorySelected }) => (
                       <>
@@ -85,7 +108,7 @@ export default function ContantDetailsMiniPage() {
                             categorySelected ? 'font-medium' : 'font-normal'
                           }`}
                         >
-                          {option.name}
+                          {option.category_name}
                         </span>
                       </>
                     )}
@@ -97,9 +120,13 @@ export default function ContantDetailsMiniPage() {
         </Listbox>
 
         <label className="form-label mt-4">Profile Headline</label>
-        <input name="first_name" className="auth-input-box block" placeholder='e.g hair sytlist or barber' type="text"/>
-
-        
+        <label className="setting-heading-sub">You can only add 5 maximum</label>            
+        <TagInput 
+          tags={inputTags} 
+          setTags={setInputTags}
+          allowBackspace />
+        <label className="setting-heading-sub">Click enter to add skill</label>
+        {/* <input name="first_name" className="auth-input-box block" placeholder='e.g hair sytlist or barber' type="text"/> */}
         
         <label className="form-label mt-4">Email</label>
         <input name="first_name" className="auth-input-box block" placeholder='e.g hair sytlist or barber' type="text"/>

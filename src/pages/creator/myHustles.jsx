@@ -138,7 +138,6 @@ export default function MyCreatorHustlesPage(){
             </div>
             : null
           }
-            
         </div>
 
         {showMyBookingModal && (

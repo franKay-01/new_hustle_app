@@ -8,7 +8,7 @@ import Loader from "../loader";
 import { ShowToast } from "../showToast";
 import NoInfoCard from "../no_info_card";
 
-export default function HustlerDetailModal({handleClose, show, handleShowServiceDetailsModal, hustler_uuid_info}) {
+export default function HustlerDetailModal({handleClose, show, handleShowServiceDetailsModal, hustler_uuid_info, hustler_id_info}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [activeView, setActiveView] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -19,6 +19,10 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
 
   const { getHustlerDetails, getAvailableTimes} = useHustleFunctions()
   const history = useNavigate();
+
+  const daysOfWeek = [
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+  ];
 
   const formatHoursOnDays = (dayInfo) => {
     const dayOrder = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -50,8 +54,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
   },[show])
 
   const getHustlerAvailableTimes = async () => {
-    const {response_code, availableTimes} = await getAvailableTimes()
-    console.log("TIMES ",JSON.stringify(availableTimes))
+    const {response_code, availableTimes} = await getAvailableTimes(hustler_id_info)
 
     if (response_code === 200){
       if (availableTimes.length > 0){
@@ -74,7 +77,6 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
   const getHuslterInfo = async () => {
     const { response_code, hustler, msg} = await getHustlerDetails(hustler_uuid_info)
     if (response_code === 200){
-      console.log(JSON.stringify(hustler))
       setHustlerDetail(hustler)
       return
     }
@@ -140,6 +142,14 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
 //     ]
 //     history('/request/search', { state: { data } });
 //   };
+
+  function formatTime24To12(time24) {
+    const [hourStr, minute] = time24.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? " pm" : " am";
+    hour = hour % 12 || 12; // Convert 0 to 12
+    return `${hour}:${minute}${ampm}`;
+  }
 
   return (
     <div className={showHideClassName}>
@@ -323,34 +333,59 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
 
                   <h1 className='modal-header-text-alt mt-4'>Working hours</h1>
                   <div className="flex flex-col gap-3">
-                    <div className="flex flex-row gap-20 items-center">
-                      <h1 className="info-card-desc w-[40px]">Monday</h1>
-                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Tuesday</h1>
-                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Wednesday</h1>
-                      <h1 className="info-card-desc items-start">09:00am - 5:30pm</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Thursday</h1>
-                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Friday</h1>
-                      <h1 className="info-card-desc">09:00am - 5:30pm</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Saturday</h1>
-                      <h1 className="info-card-desc">Closed</h1>
-                    </div>
-                    <div className="flex flex-row gap-20">
-                      <h1 className="info-card-desc w-[40px]">Sunday</h1>
-                      <h1 className="info-card-desc">Closed</h1>
-                    </div>
+                    { savedWorkingHours.length > 0 ?
+                      <>
+                      {daysOfWeek.map((day) => {
+                        const matched = savedWorkingHours.find(item => item.day.toLowerCase() === day.toLowerCase());
+
+                        let displayText;
+                        if (matched) {
+                          displayText = `${formatTime24To12(matched.opening_time)} - ${formatTime24To12(matched.closing_time)}`;
+                        } else {
+                          displayText = "Closed";
+                        }
+
+                        return (
+                          <div key={day} className="flex flex-row gap-20 items-center">
+                            <h1 className="info-card-desc w-[60px]">{day}</h1>
+                            <h1 className="info-card-desc">{displayText}</h1>
+                          </div>
+                        );
+                      })}
+                      </>
+                      :
+                      <>
+                        <div className="flex flex-row gap-20 items-center">
+                          <h1 className="info-card-desc w-[40px]">Monday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Tuesday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Wednesday</h1>
+                          <h1 className="info-card-desc items-start">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Thursday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Friday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Saturday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                        <div className="flex flex-row gap-20">
+                          <h1 className="info-card-desc w-[40px]">Sunday</h1>
+                          <h1 className="info-card-desc">Closed</h1>
+                        </div>
+                      </>
+
+                    }
                   </div>
                 </>
                 : null

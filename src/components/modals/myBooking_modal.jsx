@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
-export default function MyBookingModal({handleClose, show, handleOpenDetail}) {
+export default function MyBookingModal({handleClose, show, handleOpenDetail, pendingBookings, acceptedBookings}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [pendingOpt, setPendingOpt] = useState(true)
 
+  console.log("PENDING ", JSON.stringify(pendingBookings))
+  
   return (
     <div className={showHideClassName}>
       <section className="modal-main">

@@ -14,6 +14,7 @@ import useFunctions from "../../utils/functions";
 import { ShowToast } from "../../components/showToast";
 import useHustleFunctions from "../../utils/hustles";
 import { useNavigate } from "react-router-dom"
+import Cookies from 'js-cookie'
 
 export default function CreatorHomePage(){
   const [showHustlerDetailsModal, setShowHustlerDetailModal] = useState(false)
@@ -24,6 +25,7 @@ export default function CreatorHomePage(){
   const [allHustlers, setAllHustlers] = useState([])
   const [allTopHustlers, setAllTopHustlers] = useState([])
   const [selectedHustler, setSelectedHustler] = useState('')
+  const [selectedHustlerUuid, setSelectedHustlerUuid] = useState('')
   const [selectedService, setSelectedService] = useState({})
 
   const history = useNavigate();
@@ -76,7 +78,12 @@ export default function CreatorHomePage(){
   }
 
   const selectHustler = () => {
-    setShowHustlerDetailModal(true)
+    if (Cookies.get('token')){
+      setShowHustlerDetailModal(true)
+    }else{
+      ShowToast("error", "Please login to continue")
+      return history('/auth')
+    }
   }
 
   useEffect(()=>{
@@ -191,6 +198,7 @@ export default function CreatorHomePage(){
                           <button 
                             onClick={() => {
                               setSelectedHustler(item.id)
+                              setSelectedHustlerUuid(item.hustler_uuid)
                               selectHustler()
                             }} className='flex view-more-button view-more-button-alt justify-center items-center mt-4'>
                               <h1 className='view-more-button-text'>Book now</h1>
@@ -211,7 +219,11 @@ export default function CreatorHomePage(){
                     {allTopHustlers.length > 0 ? 
                       <>
                         {allTopHustlers.map((item, index) => {
-                          return  <div key={index} className="info-card flex flex-col justify-center items-center px-12 py-4">
+                          return  <div onClick={() =>{
+                            setSelectedHustler(item.id)
+                            setSelectedHustlerUuid(item.hustler_uuid)
+                            selectHustler()
+                          }} key={index} className="info-card cursor-pointer flex flex-col justify-center items-center px-12 py-4">
                             <img src={item.avatar ? item.avatar : NoImgIcon} className="icon-img w-12 h-12"/>
                             <h1 className="info-card-header">{item.full_name}</h1>
                             <h1 className="info-card-desc">Memeber since: {item.member_since}</h1>
@@ -236,6 +248,7 @@ export default function CreatorHomePage(){
               show={showHustlerDetailsModal}
               handleClose={() => setShowHustlerDetailModal(false)}
               hustler_uuid_info={selectedHustler}
+              hustler_id_info={selectedHustlerUuid}
               handleShowServiceDetailsModal={(service) => {
                 setSelectedService(service)
                 setShowHustlerDetailModal(false)
@@ -260,6 +273,7 @@ export default function CreatorHomePage(){
             <BookHustlerModal
               show={showBookHustlerModal}
               service={selectedService}
+              hustler_id_info={selectedHustlerUuid}
               handleClose={() => setShowBookHustlerModal(false)}
             />
           )}

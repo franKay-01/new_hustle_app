@@ -11,7 +11,7 @@ import useHustleFunctions from "../../utils/hustles";
 import Loader from "../loader";
 import { ShowToast } from "../showToast";
 
-export default function BookHustlerModal({handleClose, show, service}) {
+export default function BookHustlerModal({handleClose, show, service, hustler_id_info}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [activeView, setActiveView] = useState(false)
   const [isApplied, setIsApplied] = useState(true)
@@ -19,8 +19,6 @@ export default function BookHustlerModal({handleClose, show, service}) {
   const [savedWorkingHours, setSavedWorkingHours] = useState([])
   const [form, setForm] = useState({date_needed: '', opening_time: '8:00'})
   const [hustlerWallet, setHustlerWallet] = useState(0)
-
-  const [jobDescription, setJobDescription] = useState(true)
 
   const history = useNavigate();
 
@@ -48,10 +46,9 @@ export default function BookHustlerModal({handleClose, show, service}) {
 
   const getHustlerAvailableTimes = async () => {
     setIsLoading(true)
-    const {response_code, availableTimes} = await getAvailableTimes(Cookies.get('huid'))
+    const {response_code, availableTimes} = await getAvailableTimes(hustler_id_info)
 
     if (response_code === 200){
-      console.log("HOURS ",JSON.stringify(availableTimes))
       if (availableTimes.length > 0){
         const days = availableTimes.map(item => item.day);
 
@@ -216,7 +213,7 @@ export default function BookHustlerModal({handleClose, show, service}) {
               <MediaUpload setOriginalSelectedFile={setSelectedFile}/> */}
   
               <div className="flex justify-center mt-12">
-                <button className='flex view-more-button view-more-button-alt justify-center items-center'>
+                <button onClick={() => submitProjectDetails()} className='flex view-more-button view-more-button-alt justify-center items-center'>
                   <h1 className='view-more-button-text'>Book this hustle</h1>
                 </button>
               </div>
