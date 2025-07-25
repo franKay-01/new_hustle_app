@@ -31,7 +31,7 @@ export default function Sidebar() {
                 </svg>
                 <h1 className="sidebar-label">My Feed</h1>
               </Link>
-              <Link to={Cookies.get('is_ct') === 'true' ? '/creator/hustles' : '/myHustles'} className={`${route === '/myHustles' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
+              <Link to={Cookies.get('is_ct') === 'true' ? '/creator/hustles' : '/myHustles'} className={`${route === '/myHustles' || route === '/creator/hustles' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.0827 9.41674V5.86676C17.0827 2.50842 16.2993 1.66675 13.1493 1.66675H6.84935C3.69935 1.66675 2.91602 2.50842 2.91602 5.86676V15.2501C2.91602 17.4667 4.13269 17.9917 5.60769 16.4084L5.61601 16.4001C6.29934 15.6751 7.34101 15.7334 7.93267 16.5251L8.77435 17.6501" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M6.66602 5.83325H13.3327" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

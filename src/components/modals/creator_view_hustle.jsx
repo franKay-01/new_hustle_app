@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import ClientImg from "../../assets/images/client_img.svg"
 import { Popover } from '@headlessui/react'
+import Badge from "../badge";
 
-export default function CreatorViewHustleDetailModal({handleClose, show, handleCheckApplicant}) {
+export default function CreatorViewHustleDetailModal({handleClose, show, handleCheckApplicant, activeHustleDetails, statusMessage, handleComplete}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
   const [activeView, setActiveView] = useState(false)
   const [isApplied, setIsApplied] = useState(true)
@@ -14,6 +15,18 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
       setActiveView(false)
     }
   },[show])
+
+  const statusLabelMap = {
+    applied: 'Applied',
+    progress: 'In Progress',
+    pending: 'Awaiting service requester to mark as complete',
+    completed: 'Completed',
+    saved_hustles: 'Saved Hustles',
+    reviews: 'Reviews'
+  };
+
+  const activeKey = Object.entries(statusMessage).find(([_, value]) => value)?.[0];
+  const statusMsg = activeKey ? statusLabelMap[activeKey] : '';
 
   const hustle_url = "hello"
   const shareOnWhatsApp = () => {
@@ -68,12 +81,25 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
 //     history('/request/search', { state: { data } });
 //   };
 
+  function formatTime24To12(time24) {
+    const [hourStr, minute] = time24.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? " pm" : " am";
+    hour = hour % 12 || 12; // Convert 0 to 12
+    return `${hour}:${minute}${ampm}`;
+  }
+
   return (
     <div className={showHideClassName}>
       <section className="modal-main !bg-[#F5F5F5]">
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Hustle details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
+            { activeKey === 'pending' ?
+              <button onClick={() => handleComplete()} className='hidden lg:flex md:flex modal-more-button justify-center items-center'>
+                <h1 className='modal-more-button-text'>Mark as completed</h1>
+              </button>
+            :null }
             <Popover className="relative flex learn-display focus:outline-none">
               <Popover.Button className="learn-display">
               <svg className="w-7 h-5" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -164,7 +190,8 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
         <hr className='default'/>
         <div className="flex flex-col gap-2 p-3">
           <div className="flex flex-col">
-            <h1 className="view-more-header">Plumber needed for a bathroom fix for quick gigs</h1>
+            <Badge status={activeKey} message={statusMsg} />
+            <h1 className="view-more-header">{activeHustleDetails.title}</h1>
             <div className="flex flex-row gap-4 mt-2">
               <h1 onClick={() => setJobDescription(true)} className={`${jobDescription ? 'info-card-desc-mb info-card-desc' : 'info-card-desc'} cursor-pointer`}>Job description</h1>
               <h1 onClick={() => setJobDescription(false)} className={`${jobDescription ? 'info-card-desc' : 'info-card-desc-mb info-card-desc'} cursor-pointer`}>Applicants (3)</h1>
@@ -174,7 +201,7 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
               <>
                 <h1 className='modal-header-text-alt mt-4'>Description:</h1>
                 <h1 className="info-card-desc">
-                  Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
+                  {activeHustleDetails.description}
                 </h1>
 
                 <div className="flex flex-col mt-4">
@@ -184,7 +211,7 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
                 <div className="flex flex-row justify-between mt-4">
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Experience level</h1>
-                    <h1 className="info-card-text-color">Beginner</h1>
+                    <h1 className="info-card-text-color">{activeHustleDetails.experience_level ? activeHustleDetails.experience_level : "Not specified"}</h1>
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Hustle duration</h1>
@@ -192,23 +219,29 @@ export default function CreatorViewHustleDetailModal({handleClose, show, handleC
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Amount</h1>
-                    <h1 className="info-card-text-color">GHS 3000</h1>
+                    <h1 className="info-card-text-color">GHS {activeHustleDetails.budget}</h1>
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Preferred time</h1>
-                    <h1 className="info-card-text-color">1:00pm - 3:00pm</h1>
+                    <h1 className="info-card-text-color">{formatTime24To12(activeHustleDetails.preferred_start_time)} - {formatTime24To12(activeHustleDetails.preferred_end_time)}</h1>
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Preferred date</h1>
-                    <h1 className="info-card-text-color">November 16, 2025 - December 24, 2025 </h1>
+                    <h1 className="info-card-text-color">{activeHustleDetails.preferred_date}</h1>
                   </div>
                 </div>
 
                 <h1 className='modal-header-text-alt mt-8'>Skills & expertise</h1>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">Youtube Editor</h1>
-                  </div>
+                  { activeHustleDetails.skills_required ? 
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">Youtube Editor</h1>
+                    </div>
+                    :
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">No skills required</h1>
+                    </div>
+                  }
                 </div>
               </>
               :

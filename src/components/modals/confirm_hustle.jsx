@@ -33,7 +33,7 @@ export default function ConfirmHustleModal({handleClose, show}) {
           </svg>
           <h1 className="view-more-header text-center">Hustle completed</h1>
           <h1 className="info-card-desc">
-            You have successfully marked this hustle as completed. We would like you to take some time to rate the hustle creator.
+            You are marked this hustle as completed. We would like you to take some time to rate the hustle creator.
           </h1>
           <button onClick={handleClose} className='flex view-more-button view-more-button-alt justify-center items-center mt-4'>
             <h1 className='view-more-button-text'>Got it</h1>

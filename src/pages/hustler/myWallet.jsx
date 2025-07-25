@@ -1,12 +1,92 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Sidebar from "../../components/sidebar"
 import Navbar from "../../components/navbar"
 import NoInfoCard from "../../components/no_info_card"
 import HustleDetailModal from "../../components/modals/detail_modal";
+import useHustleFunctions from "../../utils/hustles";
+import { ShowToast } from "../../components/showToast";
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'
+import TopupModal from "../../components/modals/topup_modal";
 
 export default function MyWalletPage(){
+  const [isLoading, setIsLoading] = useState(false)
+  const [showTopup, setShowTopup] = useState(false)
   const [showOpt, setShowOpt] = useState('in_progress')
   const [showHustleDetailsModal, setShowHustleDetailModal] = useState(false)
+  const [hustlerWallet, setHustlerWallet] = useState(0)
+  const [pendingWallet, setPendingWallet] = useState(0)
+  const [hustles, setHustles] = useState({})
+
+  const history = useNavigate();
+  const {retrieveWalletDetails, getAllHustlerStats} = useHustleFunctions()
+
+  const getAmountPending = (items) => {
+    const fees = 0.05;
+
+    if (items.length > 0){
+      console.log("HERE")
+    }
+
+    console.log("HERE 2")
+    // const totalAge = hustles?.reduce((acc, hustle) => acc + user.budget, 0); 
+  }
+
+  const getHustlerWalletDetails = async () => {
+    setIsLoading(true)
+    const { response_code, wallet} = await retrieveWalletDetails()
+
+    if (response_code === 200){
+      setIsLoading(false)
+      setHustlerWallet(parseFloat(wallet))
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/')
+    }
+
+    setIsLoading(false)
+    ShowToast("error", "Wallet info retrieval failed. Try again later!")
+    return
+  }
+
+  const getStats = async () => {
+    setIsLoading(true)
+
+    const [hustlerStatsResponse, savedHustlesResponse] = await Promise.all([
+      getAllHustlerStats(Cookies.get('huid')),
+    ]);
+
+    const { response_code: statsResponseCode, stats } = hustlerStatsResponse;
+
+    if (statsResponseCode === 200){
+      const transformed = Object.fromEntries(
+        Object.entries(stats).map(([key, value]) => [
+          key.replace(/-/g, '_'),
+          value
+        ])
+      );
+
+      console.log("TRANSFORMED ",JSON.stringify(transformed))
+      const pendingPaymentItems = [...transformed.pending_creator_approval, ...transformed.in_progress]
+      getAmountPending(pendingPaymentItems)
+      setHustles(transformed)
+
+      setIsLoading(false)
+      return
+    }
+
+    setIsLoading(false)
+    ShowToast("error", "Hustle retrieval failed. Try again!")
+    return
+  }
+
+  useEffect(() => {
+    getHustlerWalletDetails()
+    getStats()
+  },[])
 
   return(
     <div className="flex h-screen overflow-hidden bg-[#F6F6F6]">
@@ -28,7 +108,7 @@ export default function MyWalletPage(){
                   </svg>
                   <h1 className="info-card-header">Available to withdraw</h1>
                 </div>
-                <h1 className="service-amount">GHS 1200.00</h1>
+                <h1 className="service-amount">GHS {hustlerWallet.toFixed(2)}</h1>
               </div>
               <div className="flex flex-col gap-1 wallet-card wallet-card-blue">
                 <div className="flex flex-row items-center gap-2">
@@ -36,9 +116,9 @@ export default function MyWalletPage(){
                     <rect width="40" height="36" rx="6" fill="#3380FF" fill-opacity="0.2"/>
                     <path d="M20 28C14.4771 28 10 23.5228 10 18C10 12.4771 14.4771 8 20 8C25.5228 8 30 12.4771 30 18C30 23.5228 25.5228 28 20 28ZM20 26C24.4183 26 28 22.4183 28 18C28 13.5817 24.4183 10 20 10C15.5817 10 12 13.5817 12 18C12 22.4183 15.5817 26 20 26ZM21 16.5V21H22V23H18V21H19V18.5H18V16.5H21ZM21.5 14C21.5 14.8284 20.8284 15.5 20 15.5C19.1716 15.5 18.5 14.8284 18.5 14C18.5 13.1716 19.1716 12.5 20 12.5C20.8284 12.5 21.5 13.1716 21.5 14Z" fill="#3380FF"/>
                   </svg>
-                  <h1 className="info-card-header">Available to withdraw</h1>
+                  <h1 className="info-card-header">Pending payment</h1>
                 </div>
-                <h1 className="service-amount">GHS 1200.00</h1>
+                <h1 className="service-amount">GHS {pendingWallet.toFixed(2)}</h1>
               </div>
               <div className="flex flex-col gap-1 wallet-card wallet-card-pink">
                 <div className="flex flex-row items-center gap-2">
@@ -46,7 +126,7 @@ export default function MyWalletPage(){
                     <rect width="40" height="36" rx="6" fill="#E278FD" fill-opacity="0.2"/>
                     <path d="M20 28C14.4771 28 10 23.5228 10 18C10 12.4771 14.4771 8 20 8C25.5228 8 30 12.4771 30 18C30 23.5228 25.5228 28 20 28ZM20 26C24.4183 26 28 22.4183 28 18C28 13.5817 24.4183 10 20 10C15.5817 10 12 13.5817 12 18C12 22.4183 15.5817 26 20 26ZM21 16.5V21H22V23H18V21H19V18.5H18V16.5H21ZM21.5 14C21.5 14.8284 20.8284 15.5 20 15.5C19.1716 15.5 18.5 14.8284 18.5 14C18.5 13.1716 19.1716 12.5 20 12.5C20.8284 12.5 21.5 13.1716 21.5 14Z" fill="#E07BE9"/>
                   </svg>
-                  <h1 className="info-card-header">Available to withdraw</h1>
+                  <h1 className="info-card-header">Total earning this year</h1>
                 </div>
                 <h1 className="service-amount">GHS 1200.00</h1>
               </div>
@@ -60,6 +140,18 @@ export default function MyWalletPage(){
                     <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   <h1 className="info-card-header">Withdraw</h1>
+                </div>
+              </div>
+              <div onClick={() => setShowTopup(true)} className="flex flex-col gap-1 !px-4 !py-1 wallet-card wallet-card-cyan">
+                <div className="flex flex-row items-center gap-2">
+                  <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="0.5" width="44" height="44" rx="22" fill="#C2D5D4" fill-opacity="0.2"/>
+                    <path d="M19.4993 30.8327H24.4993C28.666 30.8327 30.3327 29.166 30.3327 24.9993V19.9993C30.3327 15.8327 28.666 14.166 24.4993 14.166H19.4993C15.3327 14.166 13.666 15.8327 13.666 19.9993V24.9993C13.666 29.166 15.3327 30.8327 19.4993 30.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20.8242 18.9004H24.3576V22.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M24.3573 18.9004L19.6406 23.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <h1 className="info-card-header">Topup</h1>
                 </div>
               </div>
             </div>
@@ -122,6 +214,10 @@ export default function MyWalletPage(){
             
           </div>
         </div>
+
+        { showTopup && (
+          <TopupModal show={showTopup} handleClose={() => setShowTopup(false)}/>
+        )}
       </main>
     </div>
   )

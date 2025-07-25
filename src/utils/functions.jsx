@@ -213,6 +213,7 @@ const useFunctions = () => {
   const topupWallet = async (params, endpoint) => {
     try {
       const {data, status} = await executeReq(endpoint, params)
+
       if (status === 403){
         logout()   
         return {response_code: 201} 

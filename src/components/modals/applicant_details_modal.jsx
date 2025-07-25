@@ -68,7 +68,7 @@ export default function ApplicantDetailsModal({handleClose, show, setHustleAmoun
 
   return (
     <div className={showHideClassName}>
-      <section className="modal-main !bg-[#F5F5F5]">
+      <section className="modal-main !bg-[#F5F5F5] overflow-y-auto">
         <div className="flex justify-between p-3">
           <h1 className="modal-header-text">Details</h1>
           <div className="flex flex-row gap-2 justify-between items-center">
