@@ -5,10 +5,9 @@ import { Popover } from '@headlessui/react'
 import CategoryImg from '../../assets/images/cat.png'
 import CreatorHustleAppovalModal from "./creator_hustle_approval_modal";
 
-export default function ApplicantDetailsModal({handleClose, show, setHustleAmount, showModalForApproval}) {
-
+export default function ApplicantDetailsModal({handleClose, show, setHustleAmount, showModalForApproval, bidderInfoDetails}) {
   useEffect(() => {
-    setHustleAmount(900)
+    setHustleAmount(bidderInfoDetails.amount)
   }, [show])
 
   const showHideClassName = show ? "modal display-block" : "modal display-none";
@@ -50,21 +49,34 @@ export default function ApplicantDetailsModal({handleClose, show, setHustleAmoun
       });
   }
 
-  const submitProposal = () => {
-    console.log("SUB pro")
+  const getDuration = (start_time, end_time) => {
+    const [startH, startM, startS] = start_time.split(":").map(Number);
+    const [endH, endM, endS] = end_time.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
   }
-//   const history = useNavigate();
 
-//   const handleChange = (e) => {
-//     setForm({...form, [e.target.name]: e.target.value})
-// 	}
-
-//   const handleSearch = () => {
-//     const data = [
-//       { place: form.location, title: form.title}
-//     ]
-//     history('/request/search', { state: { data } });
-//   };
+  function formatTime24To12(time24) {
+    const [hourStr, minute] = time24.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? " pm" : " am";
+    hour = hour % 12 || 12; // Convert 0 to 12
+    return `${hour}:${minute}${ampm}`;
+  }
 
   return (
     <div className={showHideClassName}>
@@ -186,7 +198,7 @@ export default function ApplicantDetailsModal({handleClose, show, setHustleAmoun
               <div className="flex flex-row gap-2 items-start mb-2">
                 <img src={CategoryImg} className="icon-img w-16 h-16" alt="Client Image"/>
                 <div className="flex flex-col gap-2">
-                  <h1 className="view-more-header view-more-header-alt">Fred Amoah</h1>
+                  <h1 className="view-more-header view-more-header-alt">{bidderInfoDetails.hustler.full_name}</h1>
                   <h1 className="modal-header-text-alt !font-[500] !text-[16px]">Makeup Artist | NailTech | Lash Tech</h1>
                   <div className="flex flex-row gap-1">
                       <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -208,33 +220,48 @@ export default function ApplicantDetailsModal({handleClose, show, setHustleAmoun
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row gap-2 items-center mb-4">
+              {/* <div className="flex flex-row gap-2 items-center mb-4">
                 <h1 className="modal-header-text-alt !font-[500] !text-[16px] !text-[#0542D4]">View hustler’s full profile</h1>
                 <svg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.67341 2.33325H0.666748V3.66659H8.67341V5.66659L11.3334 2.99992L8.67341 0.333252V2.33325Z" fill="#0542D4"/>
                 </svg>
-              </div>
-              
+              </div> */}
             </div>
             <hr className='default'/>
 
             <h1 className="info-card-desc mt-4 mb-1">Total Cost</h1>
             <span className="flex flex-row items-center">
-              <h1 className="view-more-header !font-[500] !text-[15px] view-more-header-alt">GHS 600/</h1>
+              <h1 className="view-more-header !font-[500] !text-[15px] view-more-header-alt">GHS {bidderInfoDetails.amount}/</h1>
               <h1 className="info-card-desc">per service</h1>
             </span>
 
             <h1 className="info-card-desc mt-4 mb-1">Duration</h1>
-            <h1 className="view-more-header !font-[400] !text-[15px] view-more-header-alt">45 minutes</h1>
+            <h1 className="view-more-header !font-[400] !text-[15px] view-more-header-alt">
+              { bidderInfoDetails.proposed_start_time === null ? 
+                'Duration specified by job requester' 
+              :
+                <>
+                  {getDuration(bidderInfoDetails.proposed_start_time, bidderInfoDetails.proposed_end_time)}
+                </>
+              }
+            </h1>
 
             <div className="flex flex-row gap-4">
               <div className="flex flex-col">
                 <h1 className="info-card-desc mt-4 mb-1">Preferred date</h1>
-                <h1 className="view-more-header !text-[15px] !font-[400] view-more-header-alt">April 16 2025 - April 24 2025 </h1>
+                <h1 className="view-more-header !text-[15px] !font-[400] view-more-header-alt">{bidderInfoDetails.proposed_date}</h1>
               </div>
               <div className="flex flex-col">
                 <h1 className="info-card-desc mt-4 mb-1">Preferred time</h1>
-                <h1 className="view-more-header !text-[15px] !font-[400] view-more-header-alt">03:30pm - 04:00pm</h1>
+                <h1 className="view-more-header !text-[15px] !font-[400] view-more-header-alt">
+                  { bidderInfoDetails.proposed_start_time === null ? 
+                    'Time specified by job requester' 
+                  :
+                    <>
+                      {formatTime24To12(bidderInfoDetails.proposed_start_time)} - {formatTime24To12(bidderInfoDetails.proposed_end_time)}
+                    </>
+                  }
+                </h1>
               </div>
             </div>
 
@@ -244,7 +271,7 @@ export default function ApplicantDetailsModal({handleClose, show, setHustleAmoun
               <button onClick={() => showModalForApproval()} className='flex my-booking-button justify-center items-center'>
                 <h1 className='booking-card-button-text'>Accept offer</h1>
               </button>
-              <button className='flex my-booking-button-alt-c justify-center items-center'>
+              <button onClick={() => handleClose()} className='flex my-booking-button-alt-c justify-center items-center'>
                 <h1 className='booking-card-button-text booking-card-button-text-alt'>Reject this proposal</h1>
               </button>
             </div>

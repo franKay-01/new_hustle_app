@@ -10,6 +10,7 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
   const [isApplied, setIsApplied] = useState(true)
   const [jobDescription, setJobDescription] = useState(true)
 
+  console.log(activeHustleDetails)
   useEffect(() => {
     if (show){
       setActiveView(false)
@@ -73,18 +74,27 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
     return `${hour}:${minute}${ampm}`;
   }
 
-//   const history = useNavigate();
 
-//   const handleChange = (e) => {
-//     setForm({...form, [e.target.name]: e.target.value})
-// 	}
+  const getDuration = (start_time, end_time) => {
+    const [startH, startM, startS] = start_time.split(":").map(Number);
+    const [endH, endM, endS] = end_time.split(":").map(Number);
 
-//   const handleSearch = () => {
-//     const data = [
-//       { place: form.location, title: form.title}
-//     ]
-//     history('/request/search', { state: { data } });
-//   };
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
+  }
 
   return (
     <div className={showHideClassName}>
@@ -264,11 +274,11 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
                 <div className="flex flex-row justify-between mt-4">
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Experience level</h1>
-                    <h1 className="info-card-text-color">{activeHustleDetails.experince_level ? activeHustleDetails.experince_level : 'Not specified'}</h1>
+                    <h1 className="info-card-text-color">{activeHustleDetails.experience_level ? activeHustleDetails.experience_level : 'Not specified'}</h1>
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Hustle duration</h1>
-                    <h1 className="info-card-text-color">8 days</h1>
+                    <h1 className="info-card-text-color">{getDuration(activeHustleDetails.preferred_start_time, activeHustleDetails.preferred_end_time)}</h1>
                   </div>
                   <div className="flex flex-col">
                     <h1 className="info-card-time info-card-time-alt">Amount</h1>
@@ -287,49 +297,19 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
                 <h1 className='modal-header-text-alt mt-8'>Skills & expertise</h1>
                 <div className="flex flex-wrap gap-2 mt-2">
                   { activeHustleDetails.skills_required ? 
-                    <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">Youtube Editor</h1>
-                  </div>
-                  :
-                  <div className="skill-bubble">
-                    <h1 className="skill-bubble-text">No skills required</h1>
-                  </div>
-                  }
-                </div>
-
-                <div className="hustle-card hustle-card-alt flex flex-col">
-                  <h1 className="view-more-header view-more-header-sub mt-4 mb-2">About the client</h1>
-                  <div className="flex flex-row gap-4 items-start">
-                    <img src={ClientImg} alt="Client Image"/>
-                    <div className="flex flex-col">
-                      <h1 className="view-more-header view-more-header-alt">Fred Amoah</h1>
-                      <div className="flex flex-row gap-2">
-                        <div className="flex flex-row justify-center items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="19" viewBox="0 0 20 19" fill="none">
-                            <path d="M9.77064 1.77441L12.1577 6.61041L17.4959 7.39065L13.6332 11.1528L14.5448 16.4678L9.77064 13.9571L4.99645 16.4678L5.90802 11.1528L2.04541 7.39065L7.38354 6.61041L9.77064 1.77441Z" fill="#0A4F42"/>
-                          </svg>
-                          <p>4.6</p>
+                    <>
+                      { activeHustleDetails.skills_required.map((skill, index) => {
+                        return <div key={index} className="skill-bubble">
+                          <h1 className="skill-bubble-text">{skill}</h1>
                         </div>
-                        <p>(10 Hustles created)</p>
-                      </div>
-                      <div className="flex flex-row gap-2 items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
-                          <path fill-rule="evenodd" clip-rule="evenodd" d="M5.66716 5.16699C5.02382 5.16699 4.50049 5.69033 4.50049 6.33433C4.50049 6.97766 5.02382 7.50033 5.66716 7.50033C6.31049 7.50033 6.83382 6.97766 6.83382 6.33433C6.83382 5.69033 6.31049 5.16699 5.66716 5.16699M5.66716 8.50033C4.47249 8.50033 3.50049 7.52899 3.50049 6.33433C3.50049 5.13899 4.47249 4.16699 5.66716 4.16699C6.86182 4.16699 7.83382 5.13899 7.83382 6.33433C7.83382 7.52899 6.86182 8.50033 5.66716 8.50033" fill="#575757"/>
-                          <mask id="mask0_4444_3375" style={{ maskType:"luminance" }} maskUnits="userSpaceOnUse" x="0" y="0" width="12" height="14">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M0.166992 0.833984H11.1667V13.834H0.166992V0.833984Z" fill="white"/>
-                          </mask>
-                          <g mask="url(#mask0_4444_3375)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M5.6665 1.83398C3.18517 1.83398 1.1665 3.87198 1.1665 6.37598C1.1665 9.56198 4.91584 12.666 5.6665 12.8313C6.41717 12.6653 10.1665 9.56132 10.1665 6.37598C10.1665 3.87198 8.14784 1.83398 5.6665 1.83398V1.83398ZM5.6665 13.834C4.4705 13.834 0.166504 10.1327 0.166504 6.37598C0.166504 3.31998 2.63384 0.833984 5.6665 0.833984C8.69917 0.833984 11.1665 3.31998 11.1665 6.37598C11.1665 10.1327 6.8625 13.834 5.6665 13.834V13.834Z" fill="#575757"/>
-                          </g>
-                        </svg>
-                        <p>Ghana</p>
-                      </div>
-                      <div className="flex flex-row gap-1 ml-1 cursor-pointer underline">
-                        <p className="review-text">Reviews:</p>
-                        <p className="review-text">10</p>
-                      </div>
+                      })}
+                    </>
+                    
+                    :
+                    <div className="skill-bubble">
+                      <h1 className="skill-bubble-text">No skills required</h1>
                     </div>
-                  </div>
+                  }
                 </div>
               </>
               :
@@ -344,13 +324,27 @@ export default function ActiveHustleDetailModal({handleClose, show, statusMessag
                   </div>
                   <div className="flex flex-col mt-4">
                     <h1 className="info-card-time info-card-time-alt">Hustle duration</h1>
-                    <h1 className="info-card-text-color">8 days</h1>
+                    <h1 className="info-card-text-color">
+                      { activeHustleDetails.my_bid.proposed_start_time === null ?
+                        'Till service is rendered'
+                        :
+                        <>
+                          {getDuration(activeHustleDetails.preferred_start_time, activeHustleDetails.preferred_end_time)}
+                        </>
+                      }
+                    </h1>
                   </div>
                   <div className="flex flex-row gap-8 mt-4">
                     <div className="flex flex-col">
                       <h1 className="info-card-time info-card-time-alt">Preferred time</h1>
                       <h1 className="info-card-text-color">
-                        {formatTime24To12(activeHustleDetails.my_bid.proposed_start_time)} - {formatTime24To12(activeHustleDetails.my_bid.proposed_end_time)}
+                        { activeHustleDetails.my_bid.proposed_start_time === null ?
+                          'Till service is rendered'
+                          :
+                          <>
+                            {formatTime24To12(activeHustleDetails.my_bid.proposed_start_time)} - {formatTime24To12(activeHustleDetails.my_bid.proposed_end_time)}
+                          </>
+                        }
                       </h1>
                     </div>
                     <div className="flex flex-col">

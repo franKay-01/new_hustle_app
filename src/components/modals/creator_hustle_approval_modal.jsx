@@ -1,4 +1,4 @@
-export default function CreatorHustleAppovalModal({handleClose, show, message}) {
+export default function CreatorHustleAppovalModal({handleClose, show, message, handleBidAcceptance}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
   return (
@@ -18,10 +18,10 @@ export default function CreatorHustleAppovalModal({handleClose, show, message}) 
           <h1 className="view-more-header !leading-6 !text-[18px] !font-[400] text-left">{message}</h1>
           
           <div className="flex flex-col lg:flex-row md:flex-row gap-2 lg:gap-4 md:gap-4 mt-8">
-            <button onClick={handleClose} className='flex my-booking-button-alt-c justify-center items-center'>
+            <button onClick={() => handleClose()} className='flex my-booking-button-alt-c justify-center items-center'>
               <h1 className='booking-card-button-text booking-card-button-text-alt'>Cancel</h1>
             </button>
-            <button className='flex my-booking-button justify-center items-center'>
+            <button onClick={() => handleBidAcceptance()} className='flex my-booking-button justify-center items-center'>
               <h1 className='booking-card-button-text'>Proceed</h1>
             </button>
           </div>

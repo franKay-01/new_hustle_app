@@ -26,6 +26,7 @@ export default function MyHustlesPage(){
   const [savedHustleItems, setSavedHustleItems] = useState([])
   const [selectedHustleBooking, setSelectedHustleBooking] = useState({})
   const [selectedHustle, setSelectedHustle] = useState({})
+  const [reviewInfos, setReviewInfos] = useState([])
 
   const [activeMenu, setActiveMenu] = useState({applied: true, progress: false, pending: false, completed: false, saved_hustles: false, reviews: false})
 
@@ -59,7 +60,18 @@ export default function MyHustlesPage(){
 
       transformed.pending = pending_hustles
 
-      console.log(JSON.stringify(transformed))
+      const reviewsWithTitle = transformed.completed.flatMap((hustle) =>
+        hustle.reviews.map((review) => ({
+          title: hustle.title,
+          rating: review.rating,
+          comment: review.comment,
+          posted_at: review.posted_at,
+        }))
+      );
+
+      console.log("REVIEWS ", JSON.stringify(reviewsWithTitle))
+
+      setReviewInfos(reviewsWithTitle)
       setHustles(transformed)
 
       setIsLoading(false)
@@ -91,6 +103,27 @@ export default function MyHustlesPage(){
   useEffect(() => {
     getStats()
   },[])
+
+  const getDuration = (start_time, end_time) => {
+    const [startH, startM, startS] = start_time.split(":").map(Number);
+    const [endH, endM, endS] = end_time.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
+  }
 
   const handleUpdate = async () => {
     setIsLoading(true)
@@ -186,10 +219,10 @@ export default function MyHustlesPage(){
                 <>
                   {hustles?.pending?.length > 0 ? 
                     <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-12 mt-8">
-                      { hustles.pending.map((item, index) => {
-                        return <div className="info-card">
+                      { hustles.pending.map((hustle, index) => {
+                        return <div key={index} className="info-card">
                         <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
-                          style={{ backgroundImage: `url(${item.image ? item.image : NoInfoImg})` }}
+                          style={{ backgroundImage: `url(${hustle.image ? hustle.image : NoInfoImg})` }}
                         >
                           <svg className="absolute right-12 top-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="32" height="32" rx="16" fill="#F9F9F9"/>
@@ -215,28 +248,28 @@ export default function MyHustlesPage(){
                           </svg>
                         </div>
                         <div className="px-4 py-2">
-                          <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
-                          <h1 className="info-card-time">Posted 5 months ago</h1>
+                          <h1 className="info-card-header">{hustle.title}</h1>
+                          <h1 className="info-card-time">{hustle.posted_at}</h1>
                           <h1 className="info-card-header mt-1">Descripton:</h1>
                           <h1 className="info-card-desc info-card-ellipsis">
-                            Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
+                            {hustle.description}
                           </h1>
                           <div className="grid grid-cols-3 mt-2">
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
-                              <h1 className="info-card-text-color">Beginner</h1>
+                              <h1 className="info-card-text-color">{hustle.experience_level ? hustle.experience_level : 'Not specified'}</h1>
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                              <h1 className="info-card-text-color">3 weeks</h1>
+                              <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Amount:</h1>
-                              <h1 className="info-card-text-color">GHS 1200.00</h1>
+                              <h1 className="info-card-text-color">GHS {hustle.budget}</h1>
                             </div>
                           </div>
 
-                          <button onClick={() => setShowActiveHustleModal(true)} className='flex view-more-button justify-center items-center mt-4'>
+                          <button onClick={() => showHustleDetails(hustle)} className='flex view-more-button justify-center items-center mt-4'>
                             <h1 className='view-more-button-text'>View more details</h1>
                           </button>
                         </div>
@@ -299,7 +332,7 @@ export default function MyHustlesPage(){
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                                  <h1 className="info-card-text-color">3 weeks</h1>
+                                  <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -371,7 +404,7 @@ export default function MyHustlesPage(){
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                                  <h1 className="info-card-text-color">3 weeks</h1>
+                                  <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -443,7 +476,7 @@ export default function MyHustlesPage(){
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                                  <h1 className="info-card-text-color">3 weeks</h1>
+                                  <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -515,7 +548,7 @@ export default function MyHustlesPage(){
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                                  <h1 className="info-card-text-color">3 weeks</h1>
+                                  <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                                 </div>
                                 <div>
                                   <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -530,6 +563,66 @@ export default function MyHustlesPage(){
                           </div>
                         </div>
                       })} 
+                    </>
+                    :
+                    <div className="flex justify-center items-center">
+                      <NoInfoCard header={'No hustles available'} message={'All pending hustles will be displayed here.'}/>
+                    </div>
+                  }
+                </>
+                : null
+              }
+
+              { activeMenu.reviews ? 
+                <>
+                  { reviewInfos?.length > 0 ? 
+                    <>
+                      <h1 className="hustle-kind-text !text-[#575757] mt-8">{reviewInfos.length} reveiw(s)</h1>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 justify-between mt-4">
+                      { reviewInfos.map((review, index) => {
+                        const filledStars = review.rating;
+                        const emptyStars = 5 - filledStars;
+
+                        return <div key={index} className="flex flex-col lg:flex-row md:flex-row gap-2 justify-between booking-card">
+                          <div className="flex flex-row justify-between gap-2">
+                            <div className="flex flex-row gap-4">
+                              <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="19" cy="19" r="19" fill="#D9D9D9"/>
+                                <path d="M12 25H26V18.0314C26 14.1481 22.866 11 19 11C15.134 11 12 14.1481 12 18.0314V25ZM19 9C23.9706 9 28 13.0435 28 18.0314V27H10V18.0314C10 13.0435 14.0294 9 19 9ZM16.5 28H21.5C21.5 29.3807 20.3807 30.5 19 30.5C17.6193 30.5 16.5 29.3807 16.5 28Z" fill="#1F1F1F"/>
+                              </svg>
+                              <div className="flex flex-col gap-2">
+                                <h1 className="booking-card-header underline font-[500] cursor-pointer">
+                                  {review.title}
+                                </h1>
+                                <h1 className="booking-card-header-sub">{review.posted_at}</h1>
+                                <h1 className="flex flex-wrap booking-card-header-sub cursor-pointer">
+                                  {review.comment}
+                                </h1>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-row justify-center gap-1">
+                            <div className="flex flex-row mt-1">
+                              {Array.from({ length: filledStars }, (_, i) => (
+                                <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735Z" fill="#EBA100"/>
+                                </svg>
+                              ))}
+                              {Array.from({ length: emptyStars }).map((_, i) => (
+                                <svg key={`empty-${i}`} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735ZM8.00105 10.6455L10.8322 12.2302L10.1999 9.04796L12.5819 6.8451L9.35998 6.46306L8.00105 3.51684L6.64208 6.46306L3.42012 6.8451L5.80219 9.04796L5.16987 12.2302L8.00105 10.6455Z"
+                                    fill="#D8D8D8"
+                                  />
+                                </svg>
+                              ))}
+                            </div>
+                            <h1 className="hustle-kind-text !text-[#575757]">{review.rating.toFixed(1)} rating</h1>
+                          </div>
+                        </div>
+                        })} 
+                      </div>
                     </>
                     :
                     <div className="flex justify-center items-center">

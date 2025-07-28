@@ -16,6 +16,7 @@ import { ShowToast } from "../../components/showToast"
 import Loader from "../../components/loader"
 import Cookies from 'js-cookie'
 import RateHustlerModal from "../../components/modals/rate_modal"
+import { useNavigate } from "react-router-dom"
 
 export default function MyCreatorHustlesPage(){
   const [showMyBookingModal, setShowMyBookingModal] = useState(false)
@@ -29,11 +30,14 @@ export default function MyCreatorHustlesPage(){
   const [isLoading, setIsLoading] = useState(false)
   const [selectedHustle, setSelectedHustle] = useState({})
   const [showRateModal, setShowRateModal] = useState(false)
-
-  const [activeMenu, setActiveMenu] = useState({applied: true, progress: false, pending: false, completed: false, saved_hustles: false, reviews: false})
+  const [bidderInfo, setBidder] = useState({})
+  
+  const [activeMenu, setActiveMenu] = useState({applied: true, progress: false, pending: false, 
+    completed: false, saved_hustles: false, reviews: false, pending_hustler: false})
   const [hustleChargeAmount, setHustleChargeAmount] = useState(0)
 
-  const { getAllHustlerStats, updateHustlerRating, updateHustleStatus } = useHustleFunctions()
+  const { getAllHustlerStats, updateHustlerRating, updateHustleStatus, handleProposalStatus } = useHustleFunctions()
+  const history = useNavigate()
 
   const getStats = async () => {
     setIsLoading(true)
@@ -63,6 +67,27 @@ export default function MyCreatorHustlesPage(){
     return
   }
 
+  const getDuration = (start_time, end_time) => {
+    const [startH, startM, startS] = start_time.split(":").map(Number);
+    const [endH, endM, endS] = end_time.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
+  }
+
   const showHustleDetails = (hustle) => {
     setSelectedHustle(hustle)
     setShowCreatorViewHustleModal(true)
@@ -74,6 +99,7 @@ export default function MyCreatorHustlesPage(){
       applied: key === 'applied',
       progress: key === 'progress',
       pending: key === 'pending',
+      pending_hustler: key === 'pending_hustler',
       completed: key === 'completed',
       saved_hustles: key === 'saved_hustles',
       reviews: key === 'reviews',
@@ -120,6 +146,26 @@ export default function MyCreatorHustlesPage(){
     return
   }
 
+  const submitProposalStatusChange = async () => {
+    setIsLoading(true)
+
+    const {response_code, msg} = await handleProposalStatus(selectedHustle.id, bidderInfo.bid_uuid);
+    if (response_code === 200){
+      setIsLoading(false)
+      ShowToast("success", "Propsal accepted")
+      window.location.reload();
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/creator/home')
+    }
+
+    setIsLoading(false)
+    ShowToast("error", msg)
+  }
+
   useEffect(() => {
     getStats()
   }, [])
@@ -157,7 +203,12 @@ export default function MyCreatorHustlesPage(){
               <div className="flex flex-row mt-[1rem] gap-4 overflow-x-auto whitespace-nowrap">
                 <div onClick={() => handleIdOptionChange('applied')} className={`hustle-kind cursor-pointer ${ activeMenu.applied ? 'hustle-kind-selected' : '' }`}>
                   <h1 className={`hustle-kind-text ${ activeMenu.applied ? 'hustle-kind-text-selected' : ''}`}>
-                    Applied ({Object.keys(hustles).length > 0 ? hustles?.pending.length : 0})
+                    Created ({Object.keys(hustles).length > 0 ? hustles?.pending.length : 0})
+                  </h1>
+                </div>
+                <div onClick={() => handleIdOptionChange('pending_hustler')} className={`hustle-kind cursor-pointer ${ activeMenu.pending_hustler ? 'hustle-kind-selected' : '' }`}>
+                  <h1 className={`hustle-kind-text ${ activeMenu.pending_hustler ? 'hustle-kind-text-selected' : ''}`}>
+                    Bookings ({Object.keys(hustles).length > 0 ? hustles?.pending_hustler_approval.length : 0})
                   </h1>
                 </div>
                 <div onClick={() => handleIdOptionChange('progress')} className={`hustle-kind cursor-pointer ${ activeMenu.progress ? 'hustle-kind-selected' : '' }`}>
@@ -183,23 +234,107 @@ export default function MyCreatorHustlesPage(){
                 </div>
               </div>
               { activeMenu.applied ? 
-                <div className="flex flex-col items-center justify-center">
-                  <NoInfoCard header={'No created hustle'} message={'All hustles created will be displayed here'}/>
-                  <button onClick={() => setShowCreateHustleModal(true)} className='flex flex-row gap-2 my-booking-button justify-center items-center'>
-                    <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_7833_13326)">
-                      <path d="M12.5 2C6.98 2 2.5 6.48 2.5 12C2.5 17.52 6.98 22 12.5 22C18.02 22 22.5 17.52 22.5 12C22.5 6.48 18.02 2 12.5 2ZM17.5 13H13.5V17H11.5V13H7.5V11H11.5V7H13.5V11H17.5V13Z" fill="#FBFBFB"/>
-                      </g>
-                      <defs>
-                      <clipPath id="clip0_7833_13326">
-                      <rect width="24" height="24" fill="white" transform="translate(0.5)"/>
-                      </clipPath>
-                      </defs>
-                    </svg>
-                    <h1 className='view-more-button-text'>Create a hustle</h1>
-                  </button>
-                </div>
+                <>
+                  {hustles?.pending?.length > 0 ? 
+                    <>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-12 mt-8">
+                        { hustles.pending.map((hustle, index) => {
+                          return <div key={index} className="info-card p-3">
+                            <div className="grid grid-cols-3">
+                              <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
+                            </div>
+                            <div className="p-1 flex flex-col">
+                              <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                              <h1 className='modal-header-text-alt mt-2'>Description:</h1>
+                              <h1 className="info-card-desc line-clamp-2">
+                                {hustle.description}
+                              </h1>
+                            </div>
+                            <div className="grid grid-cols-3 mt-2">
+                                <div>
+                                  <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
+                                  <h1 className="info-card-text-color">{hustle.experience_level ? hustle.experience_level : "Not specified"}</h1>
+                                </div>
+                                <div>
+                                  <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
+                                  <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
+                                </div>
+                                <div>
+                                  <h1 className="info-card-time info-card-time-alt">Amount:</h1>
+                                  <h1 className="info-card-text-color">GHS {hustle.budget}</h1>
+                                </div>
+                              </div>
+                            <button onClick={() => showHustleDetails(hustle)} className='flex view-more-button view-more-button-alt justify-center items-center mt-4'>
+                              <h1 className='view-more-button-text'>View more details</h1>
+                            </button>
+                          </div>
+                        })}
+                      </div>
+                    </>
+                    :
+                    <div className="flex flex-col items-center justify-center">
+                      <NoInfoCard header={'No created hustle'} message={'All hustles created will be displayed here'}/>
+                      <button onClick={() => setShowCreateHustleModal(true)} className='flex flex-row gap-2 my-booking-button justify-center items-center'>
+                        <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clip-path="url(#clip0_7833_13326)">
+                          <path d="M12.5 2C6.98 2 2.5 6.48 2.5 12C2.5 17.52 6.98 22 12.5 22C18.02 22 22.5 17.52 22.5 12C22.5 6.48 18.02 2 12.5 2ZM17.5 13H13.5V17H11.5V13H7.5V11H11.5V7H13.5V11H17.5V13Z" fill="#FBFBFB"/>
+                          </g>
+                          <defs>
+                          <clipPath id="clip0_7833_13326">
+                          <rect width="24" height="24" fill="white" transform="translate(0.5)"/>
+                          </clipPath>
+                          </defs>
+                        </svg>
+                        <h1 className='view-more-button-text'>Create a hustle</h1>
+                      </button>
+                    </div>
+                  }
+                  </>
                 : null
+              }
+
+              { activeMenu.pending_hustler ? 
+                <>
+                  {hustles?.pending_hustler_approval?.length > 0 ? 
+                  <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-12 mt-8">
+                    { hustles.pending_hustler_approval.map((hustle, index) => {
+                      return <div key={index} className="info-card p-3">
+                        <div className="grid grid-cols-3">
+                          <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
+                        </div>
+                        <div className="p-1 flex flex-col">
+                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                          <h1 className='modal-header-text-alt mt-2'>Description:</h1>
+                          <h1 className="info-card-desc line-clamp-2">
+                            {hustle.description}
+                          </h1>
+                        </div>
+                        <div className="grid grid-cols-3 mt-2">
+                          <div>
+                            <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
+                            <h1 className="info-card-text-color">{hustle.experience_level ? hustle.experience_level : "Not specified"}</h1>
+                          </div>
+                          <div>
+                            <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
+                            <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
+                          </div>
+                          <div>
+                            <h1 className="info-card-time info-card-time-alt">Amount:</h1>
+                            <h1 className="info-card-text-color">GHS {hustle.budget}</h1>
+                          </div>
+                        </div>
+                        <button onClick={() => showHustleDetails(hustle)} className='flex view-more-button view-more-button-alt justify-center items-center mt-4'>
+                          <h1 className='view-more-button-text'>View more details</h1>
+                        </button>
+                      </div>
+                    })}
+                  </div>
+                  : 
+                  <div className="flex justify-center items-center">
+                    <NoInfoCard header={'No hustles available'} message={'All pending hustles will be displayed here.'}/>
+                  </div>
+                  }
+                </>:null
               }
 
               { activeMenu.progress ? 
@@ -225,7 +360,7 @@ export default function MyCreatorHustlesPage(){
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                              <h1 className="info-card-text-color">3 weeks</h1>
+                              <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -270,7 +405,7 @@ export default function MyCreatorHustlesPage(){
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                              <h1 className="info-card-text-color">3 weeks</h1>
+                              <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -317,7 +452,7 @@ export default function MyCreatorHustlesPage(){
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                              <h1 className="info-card-text-color">3 weeks</h1>
+                              <h1 className="info-card-text-color">{getDuration(hustle.preferred_start_time, hustle.preferred_end_time)}</h1>
                             </div>
                             <div>
                               <h1 className="info-card-time info-card-time-alt">Amount:</h1>
@@ -372,7 +507,8 @@ export default function MyCreatorHustlesPage(){
               confirmHustleCompleted()
               setShowCreatorViewHustleModal(false)
             }}
-            handleCheckApplicant={() => {
+            handleCheckApplicant={(bidder) => {
+              setBidder(bidder)
               setShowCreatorViewHustleModal(false)
               setShowApplicantDetailsModal(true)
             }}
@@ -382,6 +518,7 @@ export default function MyCreatorHustlesPage(){
         { showApplicantDetailsModal && (
           <ApplicantDetailsModal 
             show={showApplicantDetailsModal}
+            bidderInfoDetails={bidderInfo}
             handleClose={() => {
               setShowCreatorViewHustleModal(true)
               setShowApplicantDetailsModal(false)
@@ -395,7 +532,13 @@ export default function MyCreatorHustlesPage(){
           <CreatorHustleAppovalModal 
             show={showApproval}
             message={`You are about to be debited GHS ${hustleChargeAmount} from your wallet, the money will only be released when the hustler complete their hustle`}
-            handleClose={() => setShowApproval(false)}
+            handleClose={() => {
+              setShowApproval(false)
+            }}
+            handleBidAcceptance={() => {
+              setShowApproval(false)
+              submitProposalStatusChange()
+            }}
           />
         )}
 

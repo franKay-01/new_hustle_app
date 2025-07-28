@@ -13,7 +13,9 @@ import { ShowToast } from "../../components/showToast";
 import NoInfoCard from "../../components/no_info_card";
 import Loader from "../../components/loader";
 import NoImgIcon from "../../assets/images/client_img.svg"
+import NoHustleCardImg from "../../assets/images/no_info_img.png"
 import { useNavigate } from "react-router-dom"
+
 
 export default function HomePage(){
   const [showHustleDetailsModal, setShowHustleDetailModal] = useState(false)
@@ -23,14 +25,92 @@ export default function HomePage(){
   const [allHustles, setAllHustles] = useState([])
   const [allCategories, setAllCategories] = useState([])
   const [allTopHustlers, setAllTopHustlers] = useState([])
+  const [selectedService, setSelectedService] = useState({})
+  const [hustleDetail, setHustleDetail] = useState({})
+  const [isApplied, setIsApplied] = useState(true)
 
   const history = useNavigate();
 
-  const { getAllCategories } = useFunctions()
-  const { retrieveAllHustles, getTopHustlers} = useHustleFunctions()
+  const { getAllCategories, getHustleDetail} = useFunctions()
+  const { retrieveAllHustles, getTopHustlers, createProposal } = useHustleFunctions()
 
-  const handleShowProposal = () => {
+  const submitProposal = async (info = {}, enabled) => {
+    setIsLoading(true)
 
+    const params =  {
+      'amount': enabled ? parseFloat(info.amount) : hustleDetail.budget,
+      'proposal': '',
+      'proposed_date': enabled ? info.proposed_date : hustleDetail.preferred_date,
+      'proposed_start_time': enabled ? info.selectedStartTime : hustleDetail.preferred_start_time.split(":").slice(0, 2).join(":"),
+      'proposed_end_time': enabled ? info.selectedEndTime : hustleDetail.preferred_end_time.split(":").slice(0, 2).join(":")
+    }
+
+    const {response_code, msg} = await createProposal(params, hustleDetail.id);
+    if (response_code === 200){
+      setIsLoading(false)
+      setShowCompleteModal(true)
+      return
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      window.location.reload()
+    }
+
+    setIsLoading(false)
+    ShowToast("error", msg)
+    return
+  }
+
+  const getHustleDetails = async (id) => {
+    setIsLoading(true)
+
+    const {response_code, hustle, msg} = await getHustleDetail(id);
+    if (response_code === 200){
+      if (hustle === null) {
+        ShowToast("error", "Hustle does not exist!")
+        return history('/')
+      }
+
+      console.log("HUSTLE INFO ", JSON.stringify(hustle))
+
+      setIsApplied(hustle.my_bid === null ? false : true)
+      setHustleDetail(hustle)
+      setShowHustleDetailModal(true)
+      setIsLoading(false)
+      return
+    }
+
+    if (response_code === 401){
+      setIsLoading(false)
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/')
+    }
+
+    ShowToast("error", msg)
+    setIsLoading(false)
+    return
+  }
+
+  const getDuration = (start_time, end_time) => {
+    const [startH, startM, startS] = start_time.split(":").map(Number);
+    const [endH, endM, endS] = end_time.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
   }
 
   const handleAfterProposal = () => {
@@ -69,12 +149,18 @@ export default function HomePage(){
 
     const {response_code, hustles} = await retrieveAllHustles()
     if (response_code === 200){
+      console.log(JSON.stringify(hustles))
       setAllHustles(hustles)
       return
     }
 
     ShowToast("error", "Hustle retrieval failed. Try again!")
     return
+  }
+
+  const selectHustle = (selected) => {
+    getHustleDetails(selected.hustle_uuid)
+    setSelectedService(selected)
   }
 
   useEffect(()=>{
@@ -153,11 +239,11 @@ export default function HomePage(){
 
                   {/* Grid for hustles */}
                   { allHustles.length > 0 ? 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4 lg:gap-12 md:gap-12 mt-8">
+                    <div className="span-col-2 flex flex-col gap-4 items-center justify-center mt-8">
                       { allHustles.map((item, index) => {
-                        return <div className="info-card">
+                        return <div key={index} className="info-card info-card-alt">
                           <div className="relative bg-cover bg-center min-h-[20vh] flex items-center justify-center info-card-border"
-                            style={{ backgroundImage: `url(${CategoryImg})` }}
+                            style={{ backgroundImage: `url(${ item.image === null ? NoHustleCardImg : item.image})` }}
                           >
                             <svg className="absolute right-12 top-3" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <rect width="32" height="32" rx="16" fill="#F9F9F9"/>
@@ -183,28 +269,28 @@ export default function HomePage(){
                             </svg>
                           </div>
                           <div className="px-4 py-2">
-                            <h1 className="info-card-header">Plumber needed for a bathroom fix</h1>
-                            <h1 className="info-card-time">Posted 5 months ago</h1>
+                            <h1 className="info-card-header">{item.title}</h1>
+                            <h1 className="info-card-time">{item.posted_at}</h1>
                             <h1 className="info-card-header mt-1">Descripton:</h1>
                             <h1 className="info-card-desc info-card-ellipsis">
-                              Looking for a skilled plumber to fix a leaking bathroom sink and check the bathroom pipes for any blockages. Should be reliable, fast, and have basic tools. Estimated Duration should be 1–2 hours. I’m available on weekends
+                              {item.description}
                             </h1>
                             <div className="grid grid-cols-3 mt-2">
                               <div>
                                 <h1 className="info-card-time info-card-time-alt">Experience level:</h1>
-                                <h1 className="info-card-text-color">Beginner</h1>
+                                <h1 className="info-card-text-color">{item.experience_level}</h1>
                               </div>
                               <div>
                                 <h1 className="info-card-time info-card-time-alt">Hustle Duration:</h1>
-                                <h1 className="info-card-text-color">3 weeks</h1>
+                                <h1 className="info-card-text-color">{getDuration(item.preferred_start_time, item.preferred_end_time)}</h1>
                               </div>
                               <div>
                                 <h1 className="info-card-time info-card-time-alt">Amount:</h1>
-                                <h1 className="info-card-text-color">GHS 1200.00</h1>
+                                <h1 className="info-card-text-color">GHS {item.budget}</h1>
                               </div>
                             </div>
 
-                            <button onClick={() => setShowHustleDetailModal(true)} className='flex view-more-button justify-center items-center mt-4'>
+                            <button onClick={() => selectHustle(item)} className='flex view-more-button justify-center items-center mt-4'>
                               <h1 className='view-more-button-text'>View more details</h1>
                             </button>
                           </div>
@@ -239,20 +325,24 @@ export default function HomePage(){
                   </div>
                 </div>
               </div>
-              
- 
             </>
-          }
-                 
+          }     
         </div>
         
         {showHustleDetailsModal && (
           <HustleDetailModal
             show={showHustleDetailsModal}
+            activeHustle={hustleDetail}
+            checkIsApplied={isApplied}
             handleClose={() => setShowHustleDetailModal(false)}
-            handleShowProposalModal={() => {
-              setShowHustleDetailModal(false)
-              setShowProposalModal(true)
+            handleShowProposalModal={(status) => {
+              if (status === 'true'){
+                setShowHustleDetailModal(false)
+                setShowProposalModal(true)
+              } else {
+                setShowHustleDetailModal(false)
+                submitProposal({}, false)
+              }
             }}
           />
         )}
@@ -261,7 +351,11 @@ export default function HomePage(){
           <ProposalModal
             show={showProposalModal}
             handleClose={() => setShowProposalModal(false)}
-            handleCloseAfterProposal={() => handleAfterProposal()}
+            hustlePreferredDate={hustleDetail.preferred_date}
+            handleCloseAfterProposal={(filledForm) => {
+              submitProposal(filledForm, true)
+              setShowProposalModal(false)
+            }}
           />
         )}
 

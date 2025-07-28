@@ -16,6 +16,10 @@ export default function Badge({ status, message }) {
       color: '#006E2C',
       textColor: '#fff',
     },
+    pending_hustler: {
+      color: '#9379DF',
+      textColor: '#fff',
+    },
     saved_hustles: {
       color: '#006E2C',
       textColor: '#fff',

@@ -69,7 +69,6 @@ export default function MyWalletPage(){
         ])
       );
 
-      console.log("TRANSFORMED ",JSON.stringify(transformed))
       const pendingPaymentItems = [...transformed.pending_creator_approval, ...transformed.in_progress]
       getAmountPending(pendingPaymentItems)
       setHustles(transformed)
@@ -142,18 +141,22 @@ export default function MyWalletPage(){
                   <h1 className="info-card-header">Withdraw</h1>
                 </div>
               </div>
-              <div onClick={() => setShowTopup(true)} className="flex flex-col gap-1 !px-4 !py-1 wallet-card wallet-card-cyan">
-                <div className="flex flex-row items-center gap-2">
-                  <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect y="0.5" width="44" height="44" rx="22" fill="#C2D5D4" fill-opacity="0.2"/>
-                    <path d="M19.4993 30.8327H24.4993C28.666 30.8327 30.3327 29.166 30.3327 24.9993V19.9993C30.3327 15.8327 28.666 14.166 24.4993 14.166H19.4993C15.3327 14.166 13.666 15.8327 13.666 19.9993V24.9993C13.666 29.166 15.3327 30.8327 19.4993 30.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M20.8242 18.9004H24.3576V22.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M24.3573 18.9004L19.6406 23.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <h1 className="info-card-header">Topup</h1>
+              { Cookies.get('is_ct') === 'true' ?
+                <div onClick={() => setShowTopup(true)} className="flex flex-col gap-1 !px-4 !py-1 wallet-card wallet-card-cyan">
+                  <div className="flex flex-row items-center gap-2">
+                    <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect y="0.5" width="44" height="44" rx="22" fill="#C2D5D4" fill-opacity="0.2"/>
+                      <path d="M19.4993 30.8327H24.4993C28.666 30.8327 30.3327 29.166 30.3327 24.9993V19.9993C30.3327 15.8327 28.666 14.166 24.4993 14.166H19.4993C15.3327 14.166 13.666 15.8327 13.666 19.9993V24.9993C13.666 29.166 15.3327 30.8327 19.4993 30.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M20.8242 18.9004H24.3576V22.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M24.3573 18.9004L19.6406 23.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h1 className="info-card-header">Topup</h1>
+                  </div>
                 </div>
-              </div>
+                :null
+              }
+              
             </div>
             <div className="flex flex-row gap-4 mt-4 mb-4">
               <h1 onClick={() => setShowOpt('in_progress')} className={`${showOpt === 'in_progress' ? 'info-card-desc-mb' : ''} info-card-desc cursor-pointer`}>Work in-progress balance</h1>

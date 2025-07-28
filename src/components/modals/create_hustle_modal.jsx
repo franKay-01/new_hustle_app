@@ -12,10 +12,12 @@ import { ShowToast } from '../showToast';
 import useUploadFunction from '../../utils/imageFileUpload'
 import { EditorState, convertToRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
+import { useNavigate } from "react-router-dom";
+import GooglePlacesAutocomplete, { geocodeByPlaceId } from 'react-google-places-autocomplete';
 
 export default function CreateHustleModal({handleClose, show}) {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
-  
+  const [coords, setCoords] = useState(null);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [allCategories, setAllCategories] = useState([])
   const [idImg, setIdImg] = useState("")
@@ -27,6 +29,8 @@ export default function CreateHustleModal({handleClose, show}) {
     date_needed: '', budget: '', start_time: '', end_time: ''})
 
   const editorStateRef = useRef(editorState);
+
+  const history = useNavigate();
 
   const { createHustle } = useHustleFunctions()
   const { getAllCategories } = useFunctions()
@@ -81,11 +85,7 @@ export default function CreateHustleModal({handleClose, show}) {
     setIsLoading(true)
 
     const currentState = editorStateRef.current.getCurrentContent();
-    const html = draftToHtml(convertToRaw(currentState));
     const plainText = currentState.getPlainText();
-
-    console.log('HTML:', html);
-    console.log('Plain Text:', plainText);
 
     if (categorySelected.length === 0){
       setIsLoading(false)
@@ -117,13 +117,13 @@ export default function CreateHustleModal({handleClose, show}) {
 
     const params = {
       "title": form.title,
-      "latitude": "5.666",
-      "longitude": "45.2323",
+      "latitude": coords.lat,
+      "longitude": coords.lng,
       "category_id": findCategoryId(categorySelected),
-      "description": form.hustle_description,
+      "description": plainText,
       "skills_required": inputTags,
       "image": null,
-      "document": contentImageUrl.length > 0 ? contentImageUrl[0] : null,
+      "document": contentImageUrl.length > 0 ? contentImageUrl : null,
       "experience_level": form.experience_level,
       "document_required": false,
       "budget": form.budget,
@@ -132,23 +132,43 @@ export default function CreateHustleModal({handleClose, show}) {
       "preferred_end_time": form.end_time,
       "src": "WEB"
     }
-    console.log("DATA ", JSON.stringify(params))
-    // const {response_code, msg} = await createHustle(params)
-    // if (response_code === 200){
-    //   ShowToast("success", "Hustle created successfully")
-    //   return history('/requester/hustles')
-    // }
 
-    // if (response_code === 401){
-    //   ShowToast("error", "Session expired. Sign in to continue!")
-    //   return history('/')
-    // }
+    const {response_code, msg} = await createHustle(params)
+    if (response_code === 200){
+      ShowToast("success", "Hustle created successfully")
+      window.location.reload()
+    }
+
+    if (response_code === 401){
+      ShowToast("error", "Session expired. Sign in to continue!")
+      return history('/')
+    }
 
     setIsLoading(false)
-    // ShowToast("error", msg)
-    // return
+    ShowToast("error", msg)
+    return
   }
 
+  const getDuration = () => {
+    const [startH, startM, startS] = form.start_time.split(":").map(Number);
+    const [endH, endM, endS] = form.end_time.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, startS);
+
+    const endDate = new Date();
+    endDate.setHours(endH, endM, endS);
+
+    // Calculate the difference in milliseconds
+    const diffMs = endDate.getTime() - startDate.getTime();
+
+    // Convert to hours and minutes
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const minutes = diffMins % 60;
+
+    return `${hours}h ${minutes}m`
+  }
 
   useEffect(() => {
     getCategories()
@@ -181,7 +201,7 @@ export default function CreateHustleModal({handleClose, show}) {
                   <label className="form-label mt-4">Select category</label>
                   <Listbox value={categorySelected} onChange={setCategorySelected}>
                     <div className="relative mt-1">
-                      <Listbox.Button className="relative w-full h-[3.3rem] hc-border cursor-default rounded-lg bg-white py-4 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                      <Listbox.Button className="relative z-10 w-full h-[3.3rem] hc-border cursor-default rounded-lg bg-white py-4 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                         <span className="block truncate">{categorySelected}</span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -195,7 +215,7 @@ export default function CreateHustleModal({handleClose, show}) {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                       >
-                        <Listbox.Options className="mt-1 absolute max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                        <Listbox.Options className="mt-1 z-10 absolute max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                           {allCategories?.map((option, optionIdx) => (
                             <Listbox.Option
                               key={optionIdx}
@@ -261,11 +281,32 @@ export default function CreateHustleModal({handleClose, show}) {
               <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-2'>
                 <div className='flex flex-col'>
                   <label className="form-label mt-4">Service duration</label>
-                  <input name="first_name" className="auth-input-box block" placeholder='3 hours' type="text" disabled/>
+                  <input name="duration" value={() => getDuration()} className="auth-input-box block" placeholder='3 hours' type="text" disabled/>
                 </div>
                 <div className='flex flex-col'>
-                  <label className="form-label mt-4">Location</label>
-                  <input name="first_name" className="auth-input-box block" placeholder='eg. Adenta' type="text"/>
+                  <label className="form-label mt-4 mb-1">Location</label>
+                  {/* <input name="first_name" className="auth-input-box block" placeholder='eg. Adenta' type="text"/> */}
+                  <GooglePlacesAutocomplete
+                    apiKey={process.env.REACT_APP_GOOGLE_PLACES_KEY}
+                    selectProps={{
+                      styles: {
+                        className: 'auth-input-box'
+                      },
+                      onChange: async (place) => {
+                        if (!place?.value?.place_id) return;
+
+                        try {
+                          const results = await geocodeByPlaceId(place.value.place_id);
+                          const { lat, lng } = results[0].geometry.location;
+                          setCoords({ lat: lat(), lng: lng() });
+                          console.log('Lat:', lat(), 'Lng:', lng());
+                        } catch (err) {
+                          console.error('Error getting coordinates:', err);
+                        }
+                      },
+                      placeholder: 'Search for a location',
+                    }}
+                  />
                 </div>
               </div>
 
