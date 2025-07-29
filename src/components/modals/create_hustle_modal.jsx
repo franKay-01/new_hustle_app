@@ -299,7 +299,6 @@ export default function CreateHustleModal({handleClose, show}) {
                           const results = await geocodeByPlaceId(place.value.place_id);
                           const { lat, lng } = results[0].geometry.location;
                           setCoords({ lat: lat(), lng: lng() });
-                          console.log('Lat:', lat(), 'Lng:', lng());
                         } catch (err) {
                           console.error('Error getting coordinates:', err);
                         }
