@@ -167,6 +167,7 @@ export default function MyCreatorHustlesPage(){
   }
 
   useEffect(() => {
+    console.log("process.env.REACT_APP_GOOGLE_PLACES_KEY ", process.env.REACT_APP_GOOGLE_PLACES_KEY)
     getStats()
   }, [])
 
