@@ -32,6 +32,7 @@ export default function CreateHustleModal({handleClose, show}) {
 
   const history = useNavigate();
 
+  console.log("process.env.REACT_APP_GOOGLE_PLACES_KEY ", process.env.REACT_APP_GOOGLE_PLACES_KEY)
   const { createHustle } = useHustleFunctions()
   const { getAllCategories } = useFunctions()
   const { handleImageBlobsUpload } = useUploadFunction()
