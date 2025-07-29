@@ -15,6 +15,7 @@ import { ShowToast } from "../../components/showToast";
 import useHustleFunctions from "../../utils/hustles";
 import { useNavigate } from "react-router-dom"
 import Cookies from 'js-cookie'
+import NoInfoImg from "../../assets/images/no_info_img.png"
 
 export default function CreatorHomePage(){
   const [showHustlerDetailsModal, setShowHustlerDetailModal] = useState(false)
@@ -142,7 +143,7 @@ export default function CreatorHomePage(){
                     <div className="grid grid-cols-2 gap-2">
                       { allCategories.map((item, index) => {
                         return <div key={index} className="flex flex-col w-[8rem] text-center cursor-pointer">
-                          <img className="w-[8rem] h-[5rem] rounded-xl" src={CategoryImg}/>
+                          <img className="w-[8rem] h-[5rem] rounded-xl" src={item.image_file}/>
                           <h1 className="category-desc leading-snug break-normal whitespace-normal">{item.category_name}</h1>
                         </div>
                       })}
@@ -160,6 +161,7 @@ export default function CreatorHomePage(){
                         return <div key={index} className="info-card info-card-alt p-3">
                           <div className="flex flex-row justify-between">
                             <div className="flex flex-row justify-between gap-2">
+                             
                               <img src={item.contact_info.avatar === null ? NoImgIcon : item.contact_info.avatar} className="icon-img w-12 h-12"/>
                               <div className="flex flex-col">
                                 <h1 className="info-card-header">{item.full_name}</h1>
@@ -190,7 +192,7 @@ export default function CreatorHomePage(){
                           </div>
                           <div className="p-1 flex flex-col gap-2 mt-4">
                             <h1 className="view-more-header info-card-ellipsis !text-[16px]">{item.projects[0]?.project_desc}</h1>
-                            <img src={CreatorImg} className="h-28 rounded-md mt-2"/>
+                            <img src={ item.projects?.[0]?.media?.[0]?.media_url || NoInfoImg} className="h-28 rounded-md mt-2"/>
                             <h1 className="info-card-desc line-clamp-2">
                               {item.contact_info.bio ? item.contact_info.bio : "The bio is currently blank — maybe they like to keep things mysterious."}
                             </h1>

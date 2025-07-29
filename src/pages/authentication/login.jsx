@@ -59,7 +59,6 @@ export default function LoginPage(){
   }
 
   const login = async () => {
-    console.log("FORM HERE")
     setIsLoginLoading(true)
     
     if (!form.email || !form.password){

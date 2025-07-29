@@ -11,6 +11,7 @@ import ChangeEmail from "../../components/mini_page/change_email"
 import DeleteAccount from "../../components/mini_page/delete_account"
 import DeleteAccountModal from "../../components/modals/delete_modal";
 import WorkingHoursMiniPage from "../../components/mini_page/working_hours";
+import Cookies from 'js-cookie'
 
 export default function MyHustlesPage(){
   let [isOpen, setIsOpen] = useState(true);
@@ -61,43 +62,51 @@ export default function MyHustlesPage(){
                     <Disclosure.Panel className="mt-2 pl-4">
                       <div className="flex flex-col">
                         <h1 onClick={() => setSelectedMenu('contact_details')} className="cursor-pointer setting-heading-sub">Contact details</h1>
-                        <h1 onClick={() => setSelectedMenu('my_services')} className="cursor-pointer setting-heading-sub">My services</h1>
+                        { Cookies.get('is_ct') === 'false' ? 
+                          <h1 onClick={() => setSelectedMenu('my_services')} className="cursor-pointer setting-heading-sub">My services</h1>
+                          : null
+                        }
                       </div>
                     </Disclosure.Panel>
                   </Disclosure>
-                  <div className="flex flex-row justify-between items-center">
-                    <span className="flex flex-row items-center gap-2">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1.66797 18.3333H18.3346" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 5C5.85833 5 2.5 8.35833 2.5 12.5V18.3333H17.5V12.5C17.5 8.35833 14.1417 5 10 5Z" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 1.66667V2.5" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M3.33203 3.33333L4.16536 4.16667" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16.6654 3.33333L15.832 4.16667" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <h1 className="setting-heading">Available to work</h1>
-                    </span>
-                    <Switch
-                      checked={enabled}
-                      // onChange={updateSwitchStatus}
-                      className={`${
-                        enabled ? 'toggle-active-color' : 'bg-[#1F1F1F]'
-                      } relative inline-flex h-6 w-11 items-center rounded-full`}
-                    >
-                      <span className="sr-only">Enable availability</span>
-                      <span
+                  { Cookies.get('is_ct') === 'false' ? 
+                    <div className="flex flex-row justify-between items-center">
+                      <span className="flex flex-row items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1.66797 18.3333H18.3346" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M10 5C5.85833 5 2.5 8.35833 2.5 12.5V18.3333H17.5V12.5C17.5 8.35833 14.1417 5 10 5Z" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M10 1.66667V2.5" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M3.33203 3.33333L4.16536 4.16667" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M16.6654 3.33333L15.832 4.16667" stroke="#8F8F8F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <h1 className="setting-heading">Available to work</h1>
+                      </span>
+                      <Switch
+                        checked={enabled}
+                        // onChange={updateSwitchStatus}
                         className={`${
-                          enabled ? 'translate-x-6' : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </Switch>
-                  </div>
-                  <div onClick={() => setSelectedMenu('working_hours')} className="flex flex-row items-center gap-2 cursor-pointer">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9.99316 2.16667C14.3255 2.16677 17.8348 5.67636 17.835 9.99968C17.835 14.3231 14.3256 17.8336 9.99316 17.8337C5.66996 17.8337 2.16797 14.3242 2.16797 9.99968C2.16814 5.67532 5.67007 2.16667 9.99316 2.16667ZM10.001 2.83366C6.04176 2.83384 2.83514 6.04046 2.83496 9.99968C2.83496 13.959 6.04165 17.1665 10.001 17.1667C13.9605 17.1667 17.168 13.9592 17.168 9.99968C17.1678 6.04035 13.9603 2.83366 10.001 2.83366Z" fill="#323232" stroke="#8F8F8F"/>
-                      <path d="M9.91797 6.33333V10.4935L10.1631 10.638L13.4775 12.6048L13.374 12.7738L9.66797 10.5501V6.33333H9.91797Z" fill="#323232" stroke="#8F8F8F"/>
-                    </svg>
-                    <h1 className="setting-heading">Working hours</h1>
-                  </div>
+                          enabled ? 'toggle-active-color' : 'bg-[#1F1F1F]'
+                        } relative inline-flex h-6 w-11 items-center rounded-full`}
+                      >
+                        <span className="sr-only">Enable availability</span>
+                        <span
+                          className={`${
+                            enabled ? 'translate-x-6' : 'translate-x-1'
+                          } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                        />
+                      </Switch>
+                    </div>
+                    : null }
+                  { Cookies.get('is_ct') === 'false' ? 
+                    <div onClick={() => setSelectedMenu('working_hours')} className="flex flex-row items-center gap-2 cursor-pointer">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.99316 2.16667C14.3255 2.16677 17.8348 5.67636 17.835 9.99968C17.835 14.3231 14.3256 17.8336 9.99316 17.8337C5.66996 17.8337 2.16797 14.3242 2.16797 9.99968C2.16814 5.67532 5.67007 2.16667 9.99316 2.16667ZM10.001 2.83366C6.04176 2.83384 2.83514 6.04046 2.83496 9.99968C2.83496 13.959 6.04165 17.1665 10.001 17.1667C13.9605 17.1667 17.168 13.9592 17.168 9.99968C17.1678 6.04035 13.9603 2.83366 10.001 2.83366Z" fill="#323232" stroke="#8F8F8F"/>
+                        <path d="M9.91797 6.33333V10.4935L10.1631 10.638L13.4775 12.6048L13.374 12.7738L9.66797 10.5501V6.33333H9.91797Z" fill="#323232" stroke="#8F8F8F"/>
+                      </svg>
+                      <h1 className="setting-heading">Working hours</h1>
+                    </div>
+                    : null
+                  }
                   <Disclosure as="div">
                     <Disclosure.Button className="group flex w-full items-center justify-between">
                       <span className="flex flex-row items-center gap-2">

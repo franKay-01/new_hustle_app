@@ -15,7 +15,7 @@ import Loader from "../../components/loader";
 import NoImgIcon from "../../assets/images/client_img.svg"
 import NoHustleCardImg from "../../assets/images/no_info_img.png"
 import { useNavigate } from "react-router-dom"
-
+import NoInfoImg from "../../assets/images/no_info_img.png"
 
 export default function HomePage(){
   const [showHustleDetailsModal, setShowHustleDetailModal] = useState(false)
@@ -71,8 +71,6 @@ export default function HomePage(){
         ShowToast("error", "Hustle does not exist!")
         return history('/')
       }
-
-      console.log("HUSTLE INFO ", JSON.stringify(hustle))
 
       setIsApplied(hustle.my_bid === null ? false : true)
       setHustleDetail(hustle)
@@ -224,7 +222,7 @@ export default function HomePage(){
                     <div className="grid grid-cols-2 gap-2">
                       { allCategories.map((item, index) => {
                         return <div key={index} className="flex flex-col w-[8rem] text-center cursor-pointer">
-                          <img className="w-[8rem] h-[5rem] rounded-xl" src={CategoryImg}/>
+                          <img className="w-[8rem] h-[5rem] rounded-xl" src={item.image_file}/>
                           <h1 className="category-desc leading-snug break-normal whitespace-normal">{item.category_name}</h1>
                         </div>
                       })}

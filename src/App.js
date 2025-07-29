@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./utils/protectedRoutes"
+import Loader from "./components/loader";
 
 const AuthPage = React.lazy(()=> import('./pages/authentication/auth'));
 const RegisterPage = React.lazy(()=> import('./pages/authentication/register'));
@@ -16,7 +17,9 @@ const MyCreatorHustlesPage = React.lazy(() => import('./pages/creator/myHustles'
 
 function App() {
   return (
-    <React.Suspense fallback={"...loading"}>
+    <React.Suspense fallback={<div className="flex justify-center items-center mt-12">
+      <Loader/>
+    </div>}>
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage/>}/>

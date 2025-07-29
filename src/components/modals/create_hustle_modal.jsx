@@ -24,6 +24,7 @@ export default function CreateHustleModal({handleClose, show}) {
   const [isLoading, setIsLoading] = useState(false)
   const [categorySelected, setCategorySelected] = useState("")
   const [selectedFile, setSelectedFile] = useState([]);
+  const [selectedImageFile, setSelectedImageFile] = useState([]);
   const [inputTags, setInputTags] = useState([])
   const [form, setForm] = useState({title: '', experience_level: '', 
     date_needed: '', budget: '', start_time: '', end_time: ''})
@@ -45,6 +46,19 @@ export default function CreateHustleModal({handleClose, show}) {
 
     if (selectedFile.length > 0){
       await Promise.all(selectedFile.map(async (item) => {
+        const imageUrl = await handleImageBlobsUpload(item.fileimage);
+        mediaArray.push(imageUrl);
+      }));
+    }
+    
+    return mediaArray
+  };
+  
+  const handleImageUploads = async () => {
+    const mediaArray = []
+
+    if (selectedImageFile.length > 0){
+      await Promise.all(selectedImageFile.map(async (item) => {
         const imageUrl = await handleImageBlobsUpload(item.fileimage);
         mediaArray.push(imageUrl);
       }));
@@ -113,7 +127,8 @@ export default function CreateHustleModal({handleClose, show}) {
       return;
     }
 
-    const contentImageUrl = await handleSupportingDocumentImageUploads()
+    const contentSupportingUrl = await handleSupportingDocumentImageUploads()
+    const imageUrl = await handleImageUploads()
 
     const params = {
       "title": form.title,
@@ -122,8 +137,8 @@ export default function CreateHustleModal({handleClose, show}) {
       "category_id": findCategoryId(categorySelected),
       "description": plainText,
       "skills_required": inputTags,
-      "image": null,
-      "document": contentImageUrl.length > 0 ? contentImageUrl : null,
+      "image": imageUrl.length > 0 ? imageUrl[0] : null,
+      "document": contentSupportingUrl.length > 0 ? contentSupportingUrl[0] : null,
       "experience_level": form.experience_level,
       "document_required": false,
       "budget": form.budget,
@@ -357,8 +372,11 @@ export default function CreateHustleModal({handleClose, show}) {
                 toolbar={{ options: ['inline','list', 'link', 'image'] }} 
               />
               
-              <h1 className="form-label mt-4">Upload supporting images</h1>
-              <MediaUpload setOriginalSelectedFile={setSelectedFile}/>
+              <h1 className="form-label mt-4">Upload hustle banner</h1>
+              <MediaUpload setOriginalSelectedFile={setSelectedFile} isMultiple={false}/>
+
+              <h1 className="form-label">Upload supporting file</h1>
+              <MediaUpload setOriginalSelectedFile={setSelectedImageFile} isMultiple={false}/>
 
               <div className='flex justify-center'>
                 <button onClick={() => submitHustleDetails()} className='flex !w-[30%] view-more-button justify-center items-center mt-4'>

@@ -141,6 +141,7 @@ export default function BookHustlerModal({handleClose, show, service, hustler_id
 
     fetchData()
   },[show])
+  
   return (
     <div className={showHideClassName}>
       <section className="modal-main overflow-y-auto">

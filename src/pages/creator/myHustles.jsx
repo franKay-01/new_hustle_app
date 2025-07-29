@@ -116,6 +116,7 @@ export default function MyCreatorHustlesPage(){
     const {response_code, msg} = await updateHustlerRating(params, selectedHustle.id);
     if (response_code === 200){
       setIsLoading(false)
+      window.location.reload()
       return
     }
 
@@ -167,7 +168,6 @@ export default function MyCreatorHustlesPage(){
   }
 
   useEffect(() => {
-    console.log("process.env.REACT_APP_GOOGLE_PLACES_KEY ", process.env.REACT_APP_GOOGLE_PLACES_KEY)
     getStats()
   }, [])
 
@@ -549,7 +549,6 @@ export default function MyCreatorHustlesPage(){
             handleClose={() => {
               setShowConfirmHustleModal(false)
               setShowRateModal(true)
-              window.location.reload()
             }}
           />
         )}
@@ -561,6 +560,7 @@ export default function MyCreatorHustlesPage(){
             handleRating={(rating, comments) => handleHustleRatings(rating, comments)}
             handleClose={() => {
               setShowRateModal(false)
+              window.location.reload()
             }}
           />
         )}

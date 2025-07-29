@@ -4,7 +4,7 @@ import "./media.css"
 import { useState } from "react";
 import { ShowToast } from "../showToast";
 
-export default function MediaUpload({setOriginalSelectedFile}) {
+export default function MediaUpload({setOriginalSelectedFile, isMultiple = false}) {
   const [selectedfile, setSelectedFile] = useState([]);
   const [Files, setFiles] = useState([]);
 
@@ -21,6 +21,13 @@ export default function MediaUpload({setOriginalSelectedFile}) {
     let images = [];
     for (let i = 0; i < e.target.files.length; i++) {
       // if (selectedfile.length === 0){
+        if (isMultiple === false){
+          if (selectedfile.length > 0){
+            ShowToast("error", "You can only upload one file")
+            return
+          }
+        }
+        
         images.push((e.target.files[i]));
         let reader = new FileReader();
         let file = e.target.files[i];
@@ -104,13 +111,13 @@ export default function MediaUpload({setOriginalSelectedFile}) {
     <div className="fileupload-view">
       <div className="row justify-content-center m-0">
         <div className="col-md-6">
-          <div className="card mt-5">
+          <div className="card mt-2">
             <div className="card-body">
               <div className="kb-data-box">
                 <form onSubmit={FileUploadSubmit}>
                   <div className="kb-file-upload">
                     <div className="file-upload-box">
-                      <input type="file" id="fileupload" className="file-upload-input" onChange={InputChange} multiple={true} />
+                      <input type="file" id="fileupload" className="file-upload-input" onChange={InputChange} multiple={isMultiple} />
                       <span>Drag and drop or <span className="file-link">Choose your file</span></span>
                     </div>
                   </div>
