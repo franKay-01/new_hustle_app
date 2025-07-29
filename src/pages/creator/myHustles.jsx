@@ -149,7 +149,7 @@ export default function MyCreatorHustlesPage(){
   const submitProposalStatusChange = async () => {
     setIsLoading(true)
 
-    const {response_code, msg} = await handleProposalStatus(selectedHustle.id, bidderInfo.bid_uuid);
+    const {response_code, msg} = await handleProposalStatus(selectedHustle.hustle_uuid, bidderInfo.id);
     if (response_code === 200){
       setIsLoading(false)
       ShowToast("success", "Propsal accepted")
