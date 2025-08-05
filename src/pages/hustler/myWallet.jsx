@@ -27,7 +27,7 @@ export default function MyWalletPage(){
 
     if (items.length > 0){
       const totalAmount = items?.reduce((sum, item) => {
-        const amount = parseFloat(item.my_bid?.amount || 0);
+        const amount = parseFloat(item.my_bid?.amount || item.budget);
         return sum + amount;
       }, 0);
 
@@ -155,26 +155,27 @@ export default function MyWalletPage(){
                   <h1 className="service-amount">GHS 1200.00</h1>
                 </div>
                 <div className="flex flex-col gap-1 !px-4 !py-1 wallet-card wallet-card-cyan">
-                  <div className="flex flex-row items-center gap-2">
-                    <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect y="0.5" width="44" height="44" rx="22" fill="#C2D5D4" fill-opacity="0.2"/>
-                      <path d="M19.4993 30.8327H24.4993C28.666 30.8327 30.3327 29.166 30.3327 24.9993V19.9993C30.3327 15.8327 28.666 14.166 24.4993 14.166H19.4993C15.3327 14.166 13.666 15.8327 13.666 19.9993V24.9993C13.666 29.166 15.3327 30.8327 19.4993 30.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M20.8242 18.9004H24.3576V22.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M24.3573 18.9004L19.6406 23.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                  <div className="flex flex-col justify-center items-center gap-2">
+                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7.50033 18.8327H12.5003C16.667 18.8327 18.3337 17.166 18.3337 12.9993V7.99935C18.3337 3.83268 16.667 2.16602 12.5003 2.16602H7.50033C3.33366 2.16602 1.66699 3.83268 1.66699 7.99935V12.9993C1.66699 17.166 3.33366 18.8327 7.50033 18.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M8.8252 6.90039H12.3585V10.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12.3583 6.90039L7.6416 11.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M5 14.2578C8.24167 15.3411 11.7583 15.3411 15 14.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <h1 className="info-card-header">Withdraw</h1>
                   </div>
                 </div>
                 { Cookies.get('is_ct') === 'true' ?
                   <div onClick={() => setShowTopup(true)} className="flex flex-col gap-1 !px-4 !py-1 wallet-card wallet-card-cyan">
-                    <div className="flex flex-row items-center gap-2">
-                      <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect y="0.5" width="44" height="44" rx="22" fill="#C2D5D4" fill-opacity="0.2"/>
-                        <path d="M19.4993 30.8327H24.4993C28.666 30.8327 30.3327 29.166 30.3327 24.9993V19.9993C30.3327 15.8327 28.666 14.166 24.4993 14.166H19.4993C15.3327 14.166 13.666 15.8327 13.666 19.9993V24.9993C13.666 29.166 15.3327 30.8327 19.4993 30.8327Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.8242 18.9004H24.3576V22.4421" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M24.3573 18.9004L19.6406 23.6171" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M17 26.2578C20.2417 27.3411 23.7583 27.3411 27 26.2578" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    <div className="flex flex-col justify-center items-center gap-2">
+                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.3844 13.3652H8.21777" stroke="#0A4F42" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10.3018 11.332V15.4987" stroke="#0A4F42" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M11.0495 2.5978L11.0245 2.65613L8.60781 8.26446H6.23281C5.66615 8.26446 5.12448 8.38113 4.63281 8.58946L6.09115 5.10613L6.12448 5.0228L6.18281 4.88946C6.19948 4.83946 6.21615 4.78946 6.24115 4.7478C7.33281 2.2228 8.56615 1.6478 11.0495 2.5978Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15.5417 8.43099C15.1667 8.31432 14.7667 8.26432 14.3667 8.26432H8.6084L11.0251 2.65599L11.0501 2.59766C11.1751 2.63932 11.2917 2.69766 11.4167 2.74766L13.2584 3.52266C14.2834 3.94766 15.0001 4.38932 15.4334 4.92266C15.5167 5.02266 15.5834 5.11432 15.6417 5.22266C15.7167 5.33932 15.7751 5.45599 15.8084 5.58099C15.8417 5.65599 15.8667 5.73099 15.8834 5.79766C16.1084 6.49766 15.9751 7.35599 15.5417 8.43099Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.4351 12.3323V13.9573C18.4351 14.124 18.4268 14.2906 18.4184 14.4573C18.2601 17.3656 16.6351 18.8323 13.5518 18.8323H7.05176C6.85176 18.8323 6.65176 18.8156 6.46009 18.7906C3.81009 18.6156 2.39342 17.199 2.21842 14.549C2.19342 14.3573 2.17676 14.1573 2.17676 13.9573V12.3323C2.17676 10.6573 3.19342 9.21563 4.64342 8.59063C5.14342 8.38229 5.67676 8.26562 6.24342 8.26562H14.3768C14.7851 8.26562 15.1851 8.32396 15.5518 8.43229C17.2101 8.94063 18.4351 10.4906 18.4351 12.3323Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6.09199 5.10547L4.63366 8.5888C3.18366 9.2138 2.16699 10.6555 2.16699 12.3305V9.8888C2.16699 7.52214 3.85033 5.54714 6.09199 5.10547Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.4322 9.89036V12.332C18.4322 10.4987 17.2155 8.94036 15.5488 8.44036C15.9822 7.35703 16.1072 6.50703 15.8988 5.7987C15.8822 5.7237 15.8572 5.6487 15.8238 5.58203C17.3738 6.38203 18.4322 8.0237 18.4322 9.89036Z" stroke="#0A4F42" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
                       <h1 className="info-card-header">Topup</h1>
                     </div>
@@ -201,7 +202,7 @@ export default function MyWalletPage(){
                               <h1 className="info-card-desc">{item.description}</h1>
                             </div>
                           </div>
-                          <h1 className="service-amount">GHS {item.my_bid.amount}</h1>
+                          <h1 className="service-amount">GHS {item.my_bid ? item.my_bid.amount : item.budget}</h1>
                         </div>
                       })}
                     </div>

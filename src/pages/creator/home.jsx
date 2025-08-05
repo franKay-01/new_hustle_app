@@ -65,6 +65,7 @@ export default function CreatorHomePage(){
     const { response_code, hustlers, msg} = await getAllHustlers()
 
     if (response_code === 200) {
+      console.log("HUSTLERS ", JSON.stringify(hustlers))
       setAllHustlers(hustlers)
       return
     }
@@ -179,7 +180,7 @@ export default function CreatorHomePage(){
                                   
                                 </div>
                                 <h1 className="info-card-desc info-card-ellipsis w-[13rem]">
-                                  Makeup Artist | NailTech | Lash Tech | And anything beauty
+                                  {item.hustler_info.job_title ? JSON.parse(item.hustler_info.job_title).join(" | ") : "No job title"}
                                 </h1>
                               </div>
                             </div>

@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import Cookies from 'js-cookie';
 import { ShowToast } from './showToast'
 import { useState } from 'react'
+import NoImgIcon from "../assets/images/client_img.svg"
 
 export default function Navbar() {
   const [active, setActive] = useState(false)
@@ -129,7 +130,7 @@ export default function Navbar() {
                         { Cookies.get('avatar') === 'null' ? 
                           <span className='user-icon'></span>
                           :
-                          <img src={Cookies.get('avatar')} alt="user image" className='user-avatar-icon'/>
+                          <img src={Cookies.get('avatar') ? Cookies.get('avatar') : NoImgIcon} className="icon-img w-8 h-8"/>
                         }
                       </Popover.Button>
 
@@ -139,7 +140,7 @@ export default function Navbar() {
                             { Cookies.get('avatar') === 'null' ? 
                               <span className='user-icon'></span>
                               :
-                              <img src={Cookies.get('avatar')} alt="user image" className='user-avatar-icon'/>
+                              <img src={Cookies.get('avatar') ? Cookies.get('avatar') : NoImgIcon} className="icon-img w-8 h-8"/>
                             }
                             <div className='flex flex-col gap-2'>
                               <h1 className="bold-text-2">{Cookies.get("full_name")}</h1>

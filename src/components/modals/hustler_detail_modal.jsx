@@ -275,7 +275,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                   <img src={CategoryImg} className="icon-img w-16 h-16" alt="Client Image"/>
                   <div className="flex flex-col gap-1">
                     <h1 className="view-more-header view-more-header-alt">{hustlerDetail.full_name}</h1>
-                    <h1 className="info-card-desc">Makeup Artist | NailTech | Lash Tech</h1>
+                    <h1 className="info-card-desc">{hustlerDetail.hustler_info?.job_title ? JSON.parse(hustlerDetail.hustler_info?.job_title).join(" | ") : "No job title"}</h1>
                     <div className="flex flex-row gap-1 items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M5.66716 5.16699C5.02382 5.16699 4.50049 5.69033 4.50049 6.33433C4.50049 6.97766 5.02382 7.50033 5.66716 7.50033C6.31049 7.50033 6.83382 6.97766 6.83382 6.33433C6.83382 5.69033 6.31049 5.16699 5.66716 5.16699M5.66716 8.50033C4.47249 8.50033 3.50049 7.52899 3.50049 6.33433C3.50049 5.13899 4.47249 4.16699 5.66716 4.16699C6.86182 4.16699 7.83382 5.13899 7.83382 6.33433C7.83382 7.52899 6.86182 8.50033 5.66716 8.50033" fill="#575757"/>
@@ -286,12 +286,12 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                           <path fill-rule="evenodd" clip-rule="evenodd" d="M5.6665 1.83398C3.18517 1.83398 1.1665 3.87198 1.1665 6.37598C1.1665 9.56198 4.91584 12.666 5.6665 12.8313C6.41717 12.6653 10.1665 9.56132 10.1665 6.37598C10.1665 3.87198 8.14784 1.83398 5.6665 1.83398V1.83398ZM5.6665 13.834C4.4705 13.834 0.166504 10.1327 0.166504 6.37598C0.166504 3.31998 2.63384 0.833984 5.6665 0.833984C8.69917 0.833984 11.1665 3.31998 11.1665 6.37598C11.1665 10.1327 6.8625 13.834 5.6665 13.834V13.834Z" fill="#575757"/>
                         </g>
                       </svg>
-                      <p className="info-card-desc">{hustlerDetail.contact_info?.country}</p>
+                      <p className="info-card-desc">{hustlerDetail.contact_info?.country ? hustlerDetail.contact_info?.country : "No location provided"}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 items-start lg:items-end md:items-end">
-                  <h1 className="view-more-header !text-[16px] !text-[#0A4F42]">From GHS 20.00/hr</h1>
+                  <h1 className="view-more-header !text-[16px] !text-[#0A4F42]">From GHS {hustlerDetail.contact_info?.rate ? hustlerDetail.contact_info?.rate.toFixed(2) : "0.00"}/hr</h1>
                   <div className="flex flex-row items-center">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.72913 1.54492L12.1162 6.38091L17.4544 7.16116L13.5917 10.9233L14.5033 16.2383L9.72913 13.7276L4.95494 16.2383L5.86652 10.9233L2.00391 7.16116L7.34204 6.38091L9.72913 1.54492Z" fill="#EBA100"/>
@@ -320,15 +320,19 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
 
                   <h1 className='modal-header-text-alt mt-4'>Skills & expertise</h1>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <div className="skill-bubble">
-                      <h1 className="skill-bubble-text">Youtube Editor</h1>
-                    </div>
-                    <div className="skill-bubble">
-                      <h1 className="skill-bubble-text">Youtube Editor</h1>
-                    </div>
-                    <div className="skill-bubble">
-                      <h1 className="skill-bubble-text">Youtube Editor</h1>
-                    </div>
+                    {hustlerDetail.hustler_info?.job_title ? JSON.parse(hustlerDetail.hustler_info?.job_title).map((item, index) => {
+                      return <div key={index} className="skill-bubble">
+                        <h1 className="skill-bubble-text">{item}</h1>
+                      </div>
+                    }) : <div className="skill-bubble">
+                    <h1 className="skill-bubble-text">No skills provided</h1>
+                  </div>}
+
+                    {/* {JSON.parse(hustlerDetail.hustler_info.job_title).map((item, index) => {
+                      return <div key={index} className="skill-bubble">
+                        <h1 className="skill-bubble-text">{item}</h1>
+                      </div>
+                    })} */}
                   </div>
 
                   <h1 className='modal-header-text-alt mt-4'>Working hours</h1>
@@ -470,19 +474,29 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                   { hustlerDetail.reviews.length > 0 ?
                     <>
                       { hustlerDetail.reviews.map((item, index) => {
+                        const filledStars = item.rating;
+                        const emptyStars = 5 - filledStars;
+
                         return <div key={index} className="info-card flex flex-col px-4 py-2">
                           <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
                           <h1 className="info-card-header !font-normal underline">{item.creator?.full_name}</h1>
                           <div className="flex flex-row justify-between mt-1">
-                            <div className="flex flex-row gap-2">
-                              <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8.00016 1.3335L10.0602 5.50683L14.6668 6.18016L11.3335 9.42683L12.1202 14.0135L8.00016 11.8468L3.88016 14.0135L4.66683 9.42683L1.3335 6.18016L5.94016 5.50683L8.00016 1.3335Z" fill="#EBA100"/>
-                                <path d="M24.0002 1.3335L26.0602 5.50683L30.6668 6.18016L27.3335 9.42683L28.1202 14.0135L24.0002 11.8468L19.8802 14.0135L20.6668 9.42683L17.3335 6.18016L21.9402 5.50683L24.0002 1.3335Z" fill="#EBA100"/>
-                                <path d="M40.0002 1.3335L42.0602 5.50683L46.6668 6.18016L43.3335 9.42683L44.1202 14.0135L40.0002 11.8468L35.8802 14.0135L36.6668 9.42683L33.3335 6.18016L37.9402 5.50683L40.0002 1.3335Z" fill="#EBA100"/>
-                                <path d="M56.0002 1.3335L58.0602 5.50683L62.6668 6.18016L59.3335 9.42683L60.1202 14.0135L56.0002 11.8468L51.8802 14.0135L52.6668 9.42683L49.3335 6.18016L53.9402 5.50683L56.0002 1.3335Z" fill="#EBA100"/>
-                                <path d="M72.0002 1.3335L74.0602 5.50683L78.6668 6.18016L75.3335 9.42683L76.1202 14.0135L72.0002 11.8468L67.8802 14.0135L68.6668 9.42683L65.3335 6.18016L69.9402 5.50683L72.0002 1.3335Z" fill="#EBA100"/>
-                              </svg>
-                              <h1 className="info-card-desc !text-[12.5px]">{item.rating.toFixed(1)}</h1>
+                            <div className="flex flex-row mt-1">
+                              {Array.from({ length: filledStars }, (_, i) => (
+                                <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735Z" fill="#EBA100"/>
+                                </svg>
+                              ))}
+                              {Array.from({ length: emptyStars }).map((_, i) => (
+                                <svg key={`empty-${i}`} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735ZM8.00105 10.6455L10.8322 12.2302L10.1999 9.04796L12.5819 6.8451L9.35998 6.46306L8.00105 3.51684L6.64208 6.46306L3.42012 6.8451L5.80219 9.04796L5.16987 12.2302L8.00105 10.6455Z"
+                                    fill="#D8D8D8"
+                                  />
+                                </svg>
+                              ))}
+                              <h1 className="info-card-desc ml-1 !text-[12.5px]">{item.rating.toFixed(1)}</h1>
                             </div>
                             <h1 className="info-card-desc !text-[12.5px]">{item.posted_at}</h1>
                           </div>

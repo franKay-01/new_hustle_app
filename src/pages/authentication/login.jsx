@@ -185,7 +185,7 @@ export default function LoginPage(){
         <div className="grid grid-cols-1 gap-2 px-4 lg:px-28 md:px-12 mt-4">
           <div>
             <label className="form-label mt-1 mb-2">Enter Email</label>
-            <input onChange={handleChange} value={form.first_name} name="email" 
+            <input onChange={handleChange} value={form.email} name="email" 
             className="auth-input-box block" type="text"/>
           </div>
           <div className='relative'>
