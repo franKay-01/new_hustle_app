@@ -235,7 +235,8 @@ export default function ContantDetailsMiniPage() {
           country: fetchedProfile.contact_info?.country,
           time_zone: fetchedProfile.contact_info?.time_zone,
           minimum_rate: fetchedProfile.contact_info?.rate,
-          job_title: fetchedProfile.hustler_info?.job_title
+          job_title: fetchedProfile.hustler_info?.job_title,
+          phone: fetchedProfile.phone_number
         }));
 
         if (fetchedProfile.hustler_info.job_title) {

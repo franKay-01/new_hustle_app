@@ -65,7 +65,6 @@ export default function CreatorHomePage(){
     const { response_code, hustlers, msg} = await getAllHustlers()
 
     if (response_code === 200) {
-      console.log("HUSTLERS ", JSON.stringify(hustlers))
       setAllHustlers(hustlers)
       return
     }

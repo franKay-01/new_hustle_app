@@ -478,7 +478,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                         const emptyStars = 5 - filledStars;
 
                         return <div key={index} className="info-card flex flex-col px-4 py-2">
-                          <h1 className="info-card-header !text-[16px]">Plumber needed for a bathroom fix</h1>
+                          <h1 className="info-card-header !text-[16px]">{item.hustle.title}</h1>
                           <h1 className="info-card-header !font-normal underline">{item.creator?.full_name}</h1>
                           <div className="flex flex-row justify-between mt-1">
                             <div className="flex flex-row mt-1">
