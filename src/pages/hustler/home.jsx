@@ -215,11 +215,11 @@ export default function HomePage(){
                 <img src={NoteImg} className="hidden lg:flex md:flex lg:absolute md:absolute right-20 top-5"/>
                 <img src={CoinImg} className="hidden lg:flex md:flex lg:absolute md:absolute right-4 top-1"/>
               </div>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="flex flex-col lg:grid lg:grid-cols-4 md:grid md:grid-cols-4 gap-4">
                 <div>
                   <h1 className="main-header mb-2">Categories</h1>
                   { allCategories.length > 0 ?
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-row overflow-x-auto lg:grid lg:grid-cols-2 md:grid md:grid-cols-2 gap-2">
                       { allCategories.map((item, index) => {
                         return <div key={index} className="flex flex-col w-[8rem] text-center cursor-pointer">
                           <img className="w-[8rem] h-[5rem] rounded-xl" src={item.image_file}/>
@@ -303,7 +303,7 @@ export default function HomePage(){
                 </div>
                 <div>
                   <h1 className="main-header mb-2 mt-4">Top Hustlers</h1>
-                  <div className="flex flex-col gap-4 overflow-y-auto whitespace-nowrap">
+                  <div className="flex flex-row overflow-x-auto lg:flex-col gap-4 lg:overflow-y-auto md:flex-col gap-4 md:overflow-y-auto whitespace-nowrap">
                     {allTopHustlers.length > 0 ? 
                       <>
                         {allTopHustlers.map((item, index) => {
