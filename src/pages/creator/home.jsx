@@ -192,7 +192,7 @@ export default function CreatorHomePage(){
                           </div>
                           <div className="p-1 flex flex-col gap-2 mt-4">
                             <h1 className="view-more-header info-card-ellipsis !text-[16px]">{item.projects[0]?.project_desc}</h1>
-                            <img src={ item.projects?.[0]?.media?.[0]?.media_url || NoInfoImg} className="h-28 rounded-md mt-2"/>
+                            <img src={ item.projects?.[0]?.media?.[0]?.media_url || NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                             <h1 className="info-card-desc line-clamp-2">
                               {item.contact_info.bio ? item.contact_info.bio : "The bio is currently blank — maybe they like to keep things mysterious."}
                             </h1>

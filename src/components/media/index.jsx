@@ -40,7 +40,7 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                 filename: e.target.files[i].name,
                 filetype: e.target.files[i].type,
                 fileimage: reader.result,
-                datetime: e.target.files[i].lastModifiedDate.toLocaleString('en-IN'),
+                datetime: e.target.files[i].lastModifiedDate?.toLocaleString('en-IN'),
                 filesize: filesizes(e.target.files[i].size)
               }
             ]
@@ -53,7 +53,7 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                 filename: e.target.files[i].name,
                 filetype: e.target.files[i].type,
                 fileimage: reader.result,
-                datetime: e.target.files[i].lastModifiedDate.toLocaleString('en-IN'),
+                datetime: e.target.files[i].lastModifiedDate?.toLocaleString('en-IN'),
                 filesize: filesizes(e.target.files[i].size)
               }
             ]
