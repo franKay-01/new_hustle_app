@@ -40,7 +40,6 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                 filename: e.target.files[i].name,
                 filetype: e.target.files[i].type,
                 fileimage: reader.result,
-                datetime: e.target.files[i].lastModifiedDate?.toLocaleString('en-IN'),
                 filesize: filesizes(e.target.files[i].size)
               }
             ]
@@ -53,7 +52,6 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                 filename: e.target.files[i].name,
                 filetype: e.target.files[i].type,
                 fileimage: reader.result,
-                datetime: e.target.files[i].lastModifiedDate?.toLocaleString('en-IN'),
                 filesize: filesizes(e.target.files[i].size)
               }
             ]
@@ -124,7 +122,7 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                   <div className="kb-attach-box mb-3">
                     {
                       selectedfile.map((data, index) => {
-                        const { id, filename, filetype, fileimage, datetime, filesize } = data;
+                        const { id, filename, filetype, fileimage, filesize } = data;
                         return (
                           <div className="file-atc-box" key={id}>
                             {
@@ -135,7 +133,6 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                             <div className="file-detail">
                               <h6>{filename}</h6>
                               <p></p>
-                              <p><span>Size : {filesize}</span><span className="ml-2">Modified Time : {datetime}</span></p>
                               <div className="file-actions">
                                 <button type="button" className="file-action-btn" onClick={() => DeleteSelectFile(id)}>Delete</button>
                               </div>
@@ -150,7 +147,7 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                   <div className="kb-attach-box">
                     <hr />
                     { Files.map((data, index) => {
-                        const { id, filename, filetype, fileimage, datetime, filesize } = data;
+                        const { id, filename, filetype, fileimage, filesize } = data;
                         return (
                           <div className="file-atc-box" key={index}>
                             {
@@ -160,7 +157,6 @@ export default function MediaUpload({setOriginalSelectedFile, isMultiple = false
                             }
                             <div className="file-detail">
                               <h6>{filename}</h6>
-                              <p><span>Size : {filesize}</span><span className="ml-3">Modified Time : {datetime}</span></p>
                               <div className="file-actions">
                                 <button className="file-action-btn" onClick={() => DeleteFile(id)}>Delete</button>
                                 <a href={fileimage}  className="file-action-btn" download={filename}>Download</a>
