@@ -24,7 +24,7 @@ export default function Sidebar() {
         <nav className="flex flex-col space-y-2 px-4 text-left">
           { Cookies.get('token') ?
             <>
-              <Link to={Cookies.get('is_ct') === 'true' ? '/creator/home' : '/'} className={`${route === '/' || route === '/creator/home' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
+              <Link to={Cookies.get('is_ct') === 'true' ? '/creator/home' : '/'} className={`${route === '/' || route === '/creator/home' || route === '/search' ? 'bg-[#FDBA40]' : ''} flex flex-row gap-2 text-black py-2 px-4 rounded text-left items-center`}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M7.51602 2.36667L3.02435 5.86667C2.27435 6.45 1.66602 7.69167 1.66602 8.63334V14.8083C1.66602 16.7417 3.24102 18.325 5.17435 18.325H14.8244C16.7577 18.325 18.3327 16.7417 18.3327 14.8167V8.75C18.3327 7.74167 17.6577 6.45 16.8327 5.875L11.6827 2.26667C10.516 1.45 8.64102 1.49167 7.51602 2.36667Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M10 14.9917V12.4917" stroke="#F3E4C8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

@@ -8,6 +8,7 @@ import { ShowToast } from '../../components/showToast';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
 import useCheckPasswordFunction from "../../utils/checkPassword";
 import { useNavigate, Link, useLocation} from 'react-router-dom';
+import { generateToken, auth} from "../../notifications/firebase"
 
 export default function RegisterDetailsPage(){
   const [form, setForm] = useState({first_name: '', last_name: '', email: '', password: '', confirm_password: '', time_zone: ''})
@@ -102,13 +103,13 @@ export default function RegisterDetailsPage(){
 
     checkLocation()
 
-    // const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // let device_token;
+    let device_token;
 
-    // if (!isMobile){
-    //   device_token = await generateToken();
-    // }
+    if (!isMobile){
+      device_token = await generateToken();
+    }
 
     if (Cookies.get("longitude") === undefined){
       setIsLoading(false)
@@ -130,8 +131,8 @@ export default function RegisterDetailsPage(){
       "longitude": Cookies.get("longitude") === undefined ? '-0.13317282646417278' : Cookies.get("longitude"),
       "latitude": Cookies.get("latitude") === undefined ? '5.720534560359222' : Cookies.get("latitude"),
       "src": "WEB",
-      // "device_token": device_token === undefined ? "WEB" : device_token
-      "device_token": "WEB"
+      "device_token": device_token === undefined ? "WEB" : device_token
+      // "device_token": "WEB"
     }
 
     const {response_code, account, msg} = await hustleNormalRegister(params)

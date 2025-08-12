@@ -15,6 +15,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { valueFormatter, formatDateTime } from '../../utils/valueFormatter';
 import TransactionModal from "../../components/modals/transactionModal"
+import ConfirmTransactionModal from "../../components/modals/confirm_transaction"
 
 export default function MyWalletPage(){
   const [isLoading, setIsLoading] = useState(false)
@@ -31,6 +32,8 @@ export default function MyWalletPage(){
   const [transactionItems, setTransactionItems] = useState([])
   const [selectedTransaction, setSelectedTransaction] = useState({});
   const [isOpen, setIsOpen] = useState(false);
+  const [showWithdrawalDone, setShowWithdrawalDone] = useState(false)
+  const [showWithdrawalDoneInfo, setShowWithdrawalDoneInfo] = useState('')
   const [orderedKeys, setOrderedKeys] = useState([])
 
   const history = useNavigate();
@@ -204,9 +207,10 @@ export default function MyWalletPage(){
     const {response_code, msg} = await withdrawalRequest(params, 'hustler/make-withdrawal')
     if (response_code === 200){
 
-      ShowToast("success", msg)
+      setShowWithdrawalDoneInfo(msg)
+      setShowWithdrawalDone(true)
       setIsLoading(false)
-      window.location.reload()
+      return
     }
 
     setIsLoading(false)
@@ -499,6 +503,10 @@ export default function MyWalletPage(){
 
         { showTopup && (
           <TopupModal show={showTopup} handleClose={() => setShowTopup(false)}/>
+        )}
+
+        { showWithdrawalDone && (
+          <ConfirmTransactionModal show={showWithdrawalDone} info={showWithdrawalDoneInfo} handleClose={() => setShowWithdrawalDone(false)}/>
         )}
 
         <TransactionModal setIsOpen={setIsOpen} isOpen={isOpen} title="Transaction Details">

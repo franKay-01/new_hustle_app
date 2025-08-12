@@ -7,7 +7,7 @@ import { ShowToast } from '../../components/showToast';
 import useFunctions from '../../utils/functions';
 import { useNavigate, Link } from 'react-router-dom';
 // import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, onAuthStateChanged, getAuth, signOut} from 'firebase/auth';
-// import { generateToken, auth} from "../../notifications/firebase"
+import { generateToken, auth} from "../../notifications/firebase"
 
 export default function LoginPage(){
   const [form, setForm] = useState({email: '', password: ''})
@@ -67,18 +67,17 @@ export default function LoginPage(){
       return
     }
 
-    // const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // let device_token;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    let device_token;
 
-    // if (!isMobile){
-    //   device_token = await generateToken();
-    // }
+    if (!isMobile){
+      device_token = await generateToken();
+    }
     
     const params = {
       "email": form.email,
       "password": form.password,
-      // "device_token": device_token === undefined ? "WEB" : device_token
-      "device_token": "WEB"
+      "device_token": device_token === undefined ? "WEB" : device_token
     }
 
     const {response_code, account, msg} = await hustleNormalLogin(params)

@@ -41,6 +41,10 @@ html, body {
   box-shadow: 5px 10px 20px 5px #01231aa8
 }
 
+.booking-card-alt{
+  box-shadow: none !important;
+}
+
 .booking-card{
   border-radius: 5px;
   background: #fff;
@@ -389,6 +393,10 @@ hr.default {
   border: 1px solid #bab6b6;
 }
 
+.auth-input-search-box{
+  padding: 5px 10px !important;
+}
+
 .auth-input-box{
   display: flex;
   padding: 10px 15px;
@@ -550,6 +558,10 @@ hr.default {
 .css-p4oxat-control, .css-hlgwow{
   height: 3rem !important;
   border-radius: 8px !important;
+}
+
+.css-p4oxat-control:focus {
+  outline: none !important;
 }
 
 .modal {

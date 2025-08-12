@@ -31,7 +31,8 @@ export default function MyCreatorHustlesPage(){
   const [selectedHustle, setSelectedHustle] = useState({})
   const [showRateModal, setShowRateModal] = useState(false)
   const [bidderInfo, setBidder] = useState({})
-  
+  const [reviewInfos, setReviewInfos] = useState([])
+
   const [activeMenu, setActiveMenu] = useState({applied: true, progress: false, pending: false, 
     completed: false, saved_hustles: false, reviews: false, pending_hustler: false})
   const [hustleChargeAmount, setHustleChargeAmount] = useState(0)
@@ -57,6 +58,16 @@ export default function MyCreatorHustlesPage(){
 
       transformed.pending = pending_hustles
 
+      const reviewsWithTitle = transformed.completed.flatMap((hustle) =>
+        hustle.reviews.map((review) => ({
+          title: hustle.title,
+          rating: review.rating,
+          comment: review.comment,
+          posted_at: review.posted_at,
+        }))
+      );
+
+      setReviewInfos(reviewsWithTitle)
       setHustles(transformed)
       setIsLoading(false)
       return
@@ -245,7 +256,7 @@ export default function MyCreatorHustlesPage(){
                               <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
                             </div>
                             <div className="p-1 flex flex-col">
-                              <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                              <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                               <h1 className='modal-header-text-alt mt-2'>Description:</h1>
                               <h1 className="info-card-desc line-clamp-2">
                                 {hustle.description}
@@ -304,7 +315,7 @@ export default function MyCreatorHustlesPage(){
                           <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
                         </div>
                         <div className="p-1 flex flex-col">
-                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                           <h1 className='modal-header-text-alt mt-2'>Description:</h1>
                           <h1 className="info-card-desc line-clamp-2">
                             {hustle.description}
@@ -348,7 +359,7 @@ export default function MyCreatorHustlesPage(){
                           <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
                         </div>
                         <div className="p-1 flex flex-col">
-                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                           <h1 className='modal-header-text-alt mt-2'>Description:</h1>
                           <h1 className="info-card-desc line-clamp-2">
                             {hustle.description}
@@ -393,7 +404,7 @@ export default function MyCreatorHustlesPage(){
                           <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
                         </div>
                         <div className="p-1 flex flex-col">
-                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                           <h1 className='modal-header-text-alt mt-2'>Description:</h1>
                           <h1 className="info-card-desc line-clamp-2">
                             {hustle.description}
@@ -440,7 +451,7 @@ export default function MyCreatorHustlesPage(){
                           <h1 className="view-more-header !text-[16px] col-span-2">{hustle.title}</h1>
                         </div>
                         <div className="p-1 flex flex-col">
-                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md mt-2"/>
+                          <img src={hustle.image ? hustle.image : NoInfoImg} className="h-28 rounded-md object-cover mt-2"/>
                           <h1 className='modal-header-text-alt mt-2'>Description:</h1>
                           <h1 className="info-card-desc line-clamp-2">
                             {hustle.description}
@@ -466,6 +477,66 @@ export default function MyCreatorHustlesPage(){
                       </div>
                       })} 
                       </div> 
+                    </>
+                    :
+                    <div className="flex justify-center items-center">
+                      <NoInfoCard header={'No hustles available'} message={'All pending hustles will be displayed here.'}/>
+                    </div>
+                  }
+                </>
+                : null
+              }
+
+              { activeMenu.reviews ? 
+                <>
+                  { reviewInfos?.length > 0 ? 
+                    <>
+                      <h1 className="hustle-kind-text !text-[#575757] mt-8">{reviewInfos.length} reveiw(s)</h1>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 justify-between mt-4">
+                      { reviewInfos.map((review, index) => {
+                        const filledStars = review.rating;
+                        const emptyStars = 5 - filledStars;
+
+                        return <div key={index} className="flex flex-col lg:flex-row md:flex-row gap-2 justify-between booking-card">
+                          <div className="flex flex-row justify-between gap-2">
+                            <div className="flex flex-row gap-4">
+                              <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="19" cy="19" r="19" fill="#D9D9D9"/>
+                                <path d="M12 25H26V18.0314C26 14.1481 22.866 11 19 11C15.134 11 12 14.1481 12 18.0314V25ZM19 9C23.9706 9 28 13.0435 28 18.0314V27H10V18.0314C10 13.0435 14.0294 9 19 9ZM16.5 28H21.5C21.5 29.3807 20.3807 30.5 19 30.5C17.6193 30.5 16.5 29.3807 16.5 28Z" fill="#1F1F1F"/>
+                              </svg>
+                              <div className="flex flex-col gap-2">
+                                <h1 className="booking-card-header underline font-[500] cursor-pointer">
+                                  {review.title}
+                                </h1>
+                                <h1 className="booking-card-header-sub">{review.posted_at}</h1>
+                                <h1 className="flex flex-wrap booking-card-header-sub cursor-pointer">
+                                  {review.comment}
+                                </h1>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-row justify-center gap-1">
+                            <div className="flex flex-row mt-1">
+                              {Array.from({ length: filledStars }, (_, i) => (
+                                <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735Z" fill="#EBA100"/>
+                                </svg>
+                              ))}
+                              {Array.from({ length: emptyStars }).map((_, i) => (
+                                <svg key={`empty-${i}`} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M8.00105 12.1735L3.29875 14.8056L4.34897 9.5201L0.392578 5.86136L5.74394 5.22687L8.00105 0.333496L10.2581 5.22687L15.6095 5.86136L11.6531 9.5201L12.7033 14.8056L8.00105 12.1735ZM8.00105 10.6455L10.8322 12.2302L10.1999 9.04796L12.5819 6.8451L9.35998 6.46306L8.00105 3.51684L6.64208 6.46306L3.42012 6.8451L5.80219 9.04796L5.16987 12.2302L8.00105 10.6455Z"
+                                    fill="#D8D8D8"
+                                  />
+                                </svg>
+                              ))}
+                            </div>
+                            <h1 className="hustle-kind-text !text-[#575757]">{review.rating.toFixed(1)} rating</h1>
+                          </div>
+                        </div>
+                        })} 
+                      </div>
                     </>
                     :
                     <div className="flex justify-center items-center">

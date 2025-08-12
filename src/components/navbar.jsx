@@ -1,7 +1,7 @@
 import { Disclosure } from '@headlessui/react'
 import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import Logo from '../assets/images/logo_alt.png'
-import {Link} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Popover } from '@headlessui/react'
 import { useEffect } from 'react'
 import Cookies from 'js-cookie';
@@ -12,7 +12,14 @@ import NoImgIcon from "../assets/images/client_img.svg"
 export default function Navbar() {
   const [active, setActive] = useState(false)
   const [navigation, setNavigation] = useState([])
+  const [hustleInfo, setHustleInfo] = useState('')
 
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setHustleInfo(e.target.value)
+  }
+  
   const updateNavigation = () => {
     if (Cookies.get('is_ct') === undefined){
       setNavigation([
@@ -90,6 +97,12 @@ export default function Navbar() {
     }
   },[])
 
+  const searchHustles = () => {
+    if (hustleInfo !== ''){
+      navigate('/search', { state: { hustleInfo } });
+    }
+  }
+
   return (
     <Disclosure as="nav" className="bg-white nav-position">
       {({ open }) => (
@@ -113,12 +126,19 @@ export default function Navbar() {
               </div>
 
               <div className="flex-1 flex items-center sm:items-stretch z-1 nav-items-margin">
-                <div className="hidden sm:block">
+                <div className="hidden sm:block relative">
                   <input
                     type="text"
+                    onChange={handleChange}
                     placeholder="Search for available hustles"
-                    className="px-4 py-2 rounded border"
+                    className="w-[20rem] px-4 py-2 bg-[#EBEBEC] rounded-md border focus:outline-none"
                   />
+                  <svg onClick={() => searchHustles()} className='absolute right-3 top-3 w-5 h-5 cursor-pointer' width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.5">
+                    <path d="M7.66634 13.9997C11.1641 13.9997 13.9997 11.1641 13.9997 7.66634C13.9997 4.16854 11.1641 1.33301 7.66634 1.33301C4.16854 1.33301 1.33301 4.16854 1.33301 7.66634C1.33301 11.1641 4.16854 13.9997 7.66634 13.9997Z" stroke="#30343D" stroke-width="1.00145" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14.6663 14.6663L13.333 13.333" stroke="#30343D" stroke-width="1.00145" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                  </svg>
                 </div>
               </div>
 
