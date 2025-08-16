@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import ClientImg from "../../assets/images/client_img.svg"
+import Cookies from 'js-cookie'
 import { Popover } from '@headlessui/react'
 import CategoryImg from '../../assets/images/cat.png'
 import useHustleFunctions from "../../utils/hustles";
@@ -77,6 +77,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
   const getHuslterInfo = async () => {
     const { response_code, hustler, msg} = await getHustlerDetails(hustler_uuid_info)
     if (response_code === 200){
+      console.log("HERE ", JSON.stringify(hustler))
       setHustlerDetail(hustler)
       return
     }
@@ -304,7 +305,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                 <div className="flex flex-row gap-8 mt-4">
                   <h1 onClick={() => setJobDescription('overview')} className={`${jobDescription === 'overview' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Overview</h1>
                   <h1 onClick={() => setJobDescription('services')} className={`${jobDescription === 'services' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Services</h1>
-                  <h1 onClick={() => setJobDescription('hustle_history')} className={`${jobDescription === 'hustle_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Hustles history</h1>
+                  {/* <h1 onClick={() => setJobDescription('hustle_history')} className={`${jobDescription === 'hustle_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Hustles history</h1> */}
                   <h1 onClick={() => setJobDescription('review_history')} className={`${jobDescription === 'review_history' ? 'info-card-desc-mb ' : ''} info-card-desc cursor-pointer`}>Reviews history</h1>
                 </div>
                 :
@@ -405,13 +406,17 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                             <h1 className="text-xl font-semibold">{item.project_name}</h1>
                             <h1 className="service-amount">GHS {item.proposed_amount.toFixed(2)}</h1>
                           </div>
-                          <img src={item.project_img ? item.project_img : CategoryImg} alt="" className='object-cover rounded-lg h-[10rem] w-full mt-2' />
+                          <img src={item.media[0]?.media_url ? item.media[0]?.media_url : CategoryImg} alt="" className='object-cover rounded-lg h-[10rem] w-full mt-2' />
                           <h1 className='font-regular text-[#535B65] mt-2 line-clamp-2'>
                           {item.project_desc}
                           </h1>
-                          <button onClick={() => handleShowServiceDetailsModal(item)} className="flex !bg-[#387D70] !w-[40%] view-more-button justify-center items-center mt-4">
-                            <h1 className='view-more-button-text !text-[14px]'>View service</h1>
-                          </button>
+                          { Cookies.get('is_ct') === 'true' ? 
+                            <button onClick={() => handleShowServiceDetailsModal(item)} className="flex !bg-[#387D70] !w-[40%] view-more-button justify-center items-center mt-4">
+                              <h1 className='view-more-button-text !text-[14px]'>View service</h1>
+                            </button>
+                            : null
+                          }
+                          
                         </div>
                       })}
                     </>:
@@ -420,7 +425,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                     
                 </div> : null
               }
-
+{/* 
               { jobDescription === 'hustle_history' ?
                 <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">
                   <div className="info-card">
@@ -467,7 +472,7 @@ export default function HustlerDetailModal({handleClose, show, handleShowService
                   </div>
                 </div>
                 : null
-              }
+              } */}
 
               { jobDescription === 'review_history' ?
                 <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4 mt-4">

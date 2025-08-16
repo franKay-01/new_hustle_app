@@ -584,6 +584,25 @@ const useHustleFunctions = () => {
     }
   }
 
+  const retrieveAllServices = async () => {
+    try {
+      const {data, status} = await executeGet('hustler/services')
+      console.log("STATUS ", JSON.stringify(data))
+      if (status === 403 || status === 401){
+        logout()   
+        return {response_code: 401} 
+      }
+
+      if (data.status === true){
+        return { response_code: 200, services: data.data }
+      }
+
+      return {response_code: 201, msg: data.message} 
+    }catch{
+      return {response_code: 201, msg: "Virtual card retrieval failed. Please try again in a few minutes"}
+    }
+  }
+
   const retrieveVirtualCardDetails = async () => {
     try {
       const {data, status} = await executeGet('hustler/virtual-wallets')
@@ -627,7 +646,7 @@ const useHustleFunctions = () => {
     updateHustlerRating, getHustlerDetails, getWalletTransactions, retrieveVirtualCardDetails,
     createVirtualCard, editCardDetails, searchHuslterAround, searchHusltesAround, saveHustle,
     unSaveHustle, getSavedHustles, getAvailableTimes, createHustlerWorkingHours, updateHustlerWorkingHours,
-    getTopHustlers}
+    getTopHustlers, retrieveAllServices}
 }
 
 export default useHustleFunctions

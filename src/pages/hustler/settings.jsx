@@ -12,6 +12,9 @@ import DeleteAccount from "../../components/mini_page/delete_account"
 import DeleteAccountModal from "../../components/modals/delete_modal";
 import WorkingHoursMiniPage from "../../components/mini_page/working_hours";
 import Cookies from 'js-cookie'
+import Loader from "../../components/loader";
+import useHustleFunctions from "../../utils/hustles";
+import { ShowToast } from "../../components/showToast";
 
 export default function MyHustlesPage(){
   let [isOpen, setIsOpen] = useState(true);
@@ -19,6 +22,9 @@ export default function MyHustlesPage(){
   const [categorySelected, setCategorySelected] = useState("")
   const [selectedMenu, setSelectedMenu] = useState('contact_details');
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [updateAvailability, setUpdateAvailability] = useState(false);
+
+  const { updateHustlerAvailabilityStatus } = useHustleFunctions()
 
   const navigation = [
     { name: 'My Hustles', href: '/myHustles', current: true },
@@ -31,6 +37,29 @@ export default function MyHustlesPage(){
 
   const handleCloseCreateService = () => {
     setSelectedMenu('my_services')
+  }
+
+  const updateSwitchStatus = async () => {
+    setUpdateAvailability(true)
+    
+    setEnabled(prevEnabled => !prevEnabled);
+
+    const params = {
+      "is_available": !enabled
+    }
+
+    const {response_code} = await updateHustlerAvailabilityStatus(params)
+
+    if (response_code === 200) {
+      setUpdateAvailability(false)
+      ShowToast("success", "Availability status updated successfully")
+      return
+    }
+
+    setEnabled(prevEnabled => !prevEnabled);
+    setUpdateAvailability(false)
+    ShowToast("error", "Availability status update failed")
+    return
   }
 
   return (
@@ -81,20 +110,24 @@ export default function MyHustlesPage(){
                         </svg>
                         <h1 className="setting-heading">Available to work</h1>
                       </span>
-                      <Switch
-                        checked={enabled}
-                        // onChange={updateSwitchStatus}
-                        className={`${
-                          enabled ? 'toggle-active-color' : 'bg-[#1F1F1F]'
-                        } relative inline-flex h-6 w-11 items-center rounded-full`}
-                      >
-                        <span className="sr-only">Enable availability</span>
-                        <span
+                      { updateAvailability ?
+                        <Loader alt={true} />
+                        :
+                        <Switch
+                          checked={enabled}
+                          onChange={updateSwitchStatus}
                           className={`${
-                            enabled ? 'translate-x-6' : 'translate-x-1'
-                          } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                        />
-                      </Switch>
+                            enabled ? 'toggle-active-color' : 'bg-[#1F1F1F]'
+                          } relative inline-flex h-6 w-11 items-center rounded-full`}
+                        >
+                          <span className="sr-only">Enable availability</span>
+                          <span
+                            className={`${
+                              enabled ? 'translate-x-6' : 'translate-x-1'
+                            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                          />
+                        </Switch>
+                      }
                     </div>
                     : null }
                   { Cookies.get('is_ct') === 'false' ? 
